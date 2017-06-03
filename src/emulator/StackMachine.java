@@ -1,4 +1,5 @@
-package stackMachine;
+package emulator;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;

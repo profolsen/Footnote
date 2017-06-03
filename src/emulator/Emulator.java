@@ -1,4 +1,4 @@
-package stackMachine;
+package emulator;
 
 import java.io.File;
 import java.util.Scanner;
