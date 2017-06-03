@@ -54,8 +54,8 @@ Finally, there is a short description of what the instruction does.
 * jmp (0x0) | (x... -> ...) this instruction pops the top value off the stack and goes to that position.
 * beq (0x1) | (x y z... -> ...) this instruction branches pops the top three values off the stack.
 If the second two popped values are equal, it branches to the first popped value.
-* 0 (0x8) | (... -> 0...) this instruction pushes a zero on the top of the stack.
-* 1 (0x9) | (... -> 1...) this instruction pushes a one on the top of the stack.
+* zero (0x8) | (... -> 0...) this instruction pushes a zero on the top of the stack.
+* one (0x9) | (... -> 1...) this instruction pushes a one on the top of the stack.
 * ld location (0x2) | (... -> val&#64;location...) this instruction pushes a value from a specified location in memory (location) onto the top of the stack.
 This instruction has two modes, determined by the value of location.
 (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack.
@@ -70,17 +70,17 @@ Like ld, this instruction operates in two modes, see ld for details.
 * ldi val (0xD) | (... -> val...) this instruction pushes the next value onto the stack.
 
 <b>Wait... No Pop?</b>
-It is true that there is no pop instruction.
-However, a value can be popped off the stack easily by doing the following sequence of instructions in order:
+It is true that there is no pop instruction.  With good memory management, being able to pop a value of the stack is unnecessary.  However, if popping is something you just can't do without, the following sequence of instructions will pop a value off the stack: 
 0. -> x y...
 1. dup -> x x y...
-2. 0 -> 0 x x y...
+2. zero -> 0 x x y...
 3. sub -> -x x y...
 4. add -> 0 y...
 5. add -> y...
+
 The disclaimer here is of course that this only works if there's more than one value on the stack.
-In general, you'll find that with good memory management, popping is unnecessary.
-However, if you can't do without it, just have the first instruction in your program be 0, that way you can always pop a value off the stack if you want.
+This problem can be easily avoided by just pushing a zero on the stack at the beginning of program execution.
+
 
 <b>System Calls.</b>
 When describing various system calls, the following format is used:
