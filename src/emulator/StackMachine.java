@@ -52,7 +52,7 @@ public class StackMachine {
 
     public void push(int v) {
         if(stack == sL) {
-            throw new RuntimeException("OVERFULL STACK");
+            throw new RuntimeException("OVERFULL STACK sL = " + sL);
         }
         memory[--stack] = v;
     }
@@ -153,7 +153,6 @@ public class StackMachine {
                 }
             break;
             case 0x0 : //print out debug info... non standard!
-                System.out.println("Not yet implemented...");
                 System.out.println("Current State of Stack Machine: ");
                 System.out.println("Memory: " + Arrays.toString(memory));
                 System.out.println("PC: " + pc);
@@ -235,7 +234,7 @@ public class StackMachine {
     public void run() {
         int command = memory[pc];
         int count = 0;
-        while (command != 0xF && count < 500) { //while command is not the halt command...
+        while (command != 0xF) { //while command is not the halt command...
             exec(command);
             command = memory[pc];
             //System.out.println("\tcmd:" + command + "@" + pc);

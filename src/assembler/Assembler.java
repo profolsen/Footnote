@@ -12,8 +12,8 @@ import java.util.Scanner;
 public class Assembler {
 
     public static void main(String[] args) throws Exception {
-        Scanner scan = new Scanner(new File("echoasm.txt"));
-        PrintStream out = new PrintStream("output.txt");
+        Scanner scan = new Scanner(new File("program.txt"));
+        PrintStream out = new PrintStream("fib.txt");
         HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
         ArrayList<String> program = new ArrayList<String>();
         ArrayList<Integer> pc = new ArrayList<Integer>();
@@ -61,7 +61,7 @@ public class Assembler {
         }
         //System.out.println(program);
         for(String s : program) {
-            out.println(s);
+            out.print(s + " ");
         }
     }
 
@@ -225,15 +225,20 @@ public class Assembler {
             inc(pc);
             program.add("" + 0x2);
             inc(pc);
+        }  else if(parts[0].equals("diagnostics")) {
+            program.add("" + 0x3);
+            inc(pc);
+            program.add("" + 0x0);
+            inc(pc);
         } else if(parts[0].equals("read")) {
             program.add("" + 0x3);
             program.add("" + 0x4);
         }else if(parts[0].equals("one")) {
-            program.add("" + 0x8);
+            program.add("" + 0x9);
             inc(pc);
 
         } else if(parts[0].equals("zero")) {
-            program.add("" + 0x9);
+            program.add("" + 0x8);
             inc(pc);
 
         }

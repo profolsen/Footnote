@@ -1,0 +1,22 @@
+; This program is designed to test the memory of a system by filling all available space.
+; Created by Paul Olsen, 2017.
+
+.declare
+:i               ; a loop counter.
+:limit 235
+
+.begin
+
+:loop
+one              ; stores a zero in the stack...
+ld :i            ; load i
+one              ; push one on the stack
+add              ; increment i
+dup              ; duplicate for storing.
+st :i            ; store i.
+ldi :limit       ; stack now contains i and limit.
+beq :end         ; if i == limit, stop.
+jmp :loop        ; otherwise, go to top of loop.
+
+:end
+hlt
