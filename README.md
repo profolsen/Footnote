@@ -2,7 +2,7 @@
 
 
 Chip Architecture
------------------  
+-----------------
 
 The chip the project simulates is simple (There are only sixteen instructions - see below) but powerful (This limited set of instructions is powerful enough to write any program).
 The chip operates on 32-bit integers and assumes a memory of 256 integers (although this is expanded on some systems).
