@@ -1,7 +1,7 @@
 # stackmachine      
 
 
-Chip Architecture     
+Chip Architecture 
 -----------------
 
 The chip the project simulates is simple (There are only sixteen instructions - see below) but powerful (This limited set of instructions is powerful enough to write any program).
