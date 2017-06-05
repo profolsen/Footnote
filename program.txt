@@ -1,0 +1,32 @@
+; Fibonacci number listing program.
+; Created by Paul Olsen, (c) 2017.
+
+.declare
+:x          ; f_{n-1}
+:y          ; f_{n}
+:limit 144
+
+.begin
+zero
+one        ; start by pushing 0 and 1 onto the stack.
+
+:loop
+dup        ; duplicate the value on the top of the stack.
+st :x      ; store the top value (f_{n-1}) on the stack to memory location x.
+           ; we'll need this number to calculate f_{n+1}
+add        ; this generates the next fibonacci number (f_{n}).
+dup        ; duplicate the top value on the stack so it can be printed.
+print      ; print f_{n}.
+println    ; print a new line.
+st :y      ; store f_{n} to memory address y.
+ld :x
+
+ld :y      ; getting ready for next iteration of the loop.
+ld :x      ; getting ready for the branch equal instruction (the while condition).
+ldi :limit    ; pushing 144 onto the stack
+beq :end   ; if x==144, goto end.
+jmp :loop  ; ...else goto loop (stay in the loop).
+
+:end
+hlt        ; end of the program.
+
