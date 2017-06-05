@@ -1,0 +1,3 @@
+read        ; reads a number from the user.
+printch     ; prints the number that was read (as a number).
+hlt         ; terminates the program.

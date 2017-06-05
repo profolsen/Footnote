@@ -93,6 +93,9 @@ After the code and arguments list, the action of the call is described.
 * 0x1 () - prints the value on top of the stack to the screen in decimal.
 * 0x2 () - Interprets the value on top of the stack as an ASCII character and then prints it to the screen.
 * 0x3 () - prints a newline character to the screen.
+* 0x4 () - user input through keyboard.
+An integer corresponding to a typed key is pushed on the stack<sup>1</sup>.
+the integer-key mapping is system dependent.
 
 <b>Example Program (Fibonacci Numbers).</b>
 The following program is designed to print out the first few fibonacci numbers (up through 233).
@@ -182,6 +185,7 @@ The next instruction to be executed is the instruction that is immediately after
 * print - pops and prints the value on the top of the stack to the screen as a decimal number.
 * printch - pops and prints the value on the top of the stack to the screen as a ASCII character.
 * println - prints a newline to the screen.
+* read - reads a character of input from the user and pushes it on the stack<sup>2</sup>.
 * add - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
 * sub - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
 * mul - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
@@ -236,5 +240,8 @@ hlt        ; end of the program.
 
 </pre>
 
+<sup>1</sup><small>This emulator uses java's System.in to handle input.  
+The input is not a perfect representation of what someone should expect on real systems.</small>
 
+<sup>2</sup><small>See note 1 supra.</small>
 

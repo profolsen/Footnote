@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Assembler {
 
     public static void main(String[] args) throws Exception {
-        Scanner scan = new Scanner(new File("program.txt"));
+        Scanner scan = new Scanner(new File("echoasm.txt"));
         PrintStream out = new PrintStream("output.txt");
         HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
         ArrayList<String> program = new ArrayList<String>();
@@ -72,7 +72,7 @@ public class Assembler {
             checkThat(parts, true, true, false);
         } else if(parts[0].equals("ld")) {
             checkThat(parts, true, true, true);
-        } else if(parts[0].equals("print") || parts[0].equals("println") || parts[0].equals("printch")) {
+        } else if(parts[0].equals("print") || parts[0].equals("println") || parts[0].equals("printch") || parts[0].equals("read")) {
             checkThat(parts, false, false, false);
         } else if(parts[0].equals("add") || parts[0].equals("sub") || parts[0].equals("mul") || parts[0].equals("div")) {
             checkThat(parts, false, false, false);
@@ -225,8 +225,10 @@ public class Assembler {
             inc(pc);
             program.add("" + 0x2);
             inc(pc);
-
-        } else if(parts[0].equals("one")) {
+        } else if(parts[0].equals("read")) {
+            program.add("" + 0x3);
+            program.add("" + 0x4);
+        }else if(parts[0].equals("one")) {
             program.add("" + 0x8);
             inc(pc);
 

@@ -1,6 +1,7 @@
 package emulator;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -142,6 +143,14 @@ public class StackMachine {
             break;
             case 0x3 : //printing a newline character to the screen.
                 System.out.println();
+            break;
+            case 0x4:
+                try {
+                    int x = System.in.read();
+                    push(x);
+                } catch (IOException e) {
+                    System.out.println("IO ERROR");
+                }
             break;
             case 0x0 : //print out debug info... non standard!
                 System.out.println("Not yet implemented...");
