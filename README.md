@@ -45,8 +45,9 @@ On the right, the after image of the stack is given by redrawing the first few i
 For example, if the stack effect is pictured as (x y... -> y x...), then this means that the top two values on the stack are reversed in order.
 Finally, there is a short description of what the instruction does.
 * dup (0xA) | (x... -> x x...) this instruction pushes a duplicate of the value on top of the stack.
-* dup2 (0xB) | (x y... -> x y x y...) this instruction duplicates the top two values on the stack.
-* dupn (0xC) | (no before & after picture drawn) this instruction pops the top value of the stack and duplicates that number of values.
+* down val (0xB) | [val = 1: (x y... -> y x...), val = 2: (x y z... -> y z x...)] this instruction moves the top element on the stack val levels deep into the stack.
+* cmp (0xC) | (x y... -> r...) this instruction pops the top value of the stack and duplicates that number of values.
+In the picture of the effects of this instruction on the stack, r is -1 if x < y, 0 if x = y, and 1 if x > y.
 * add (0x4) | (x y... -> x+y...) this instruction replaces the top value on the stack with the sum of the top two values on the stack.
 * sub (0x5) | (x y... -> x-y...) this instruction replaces the top value on the stack with the top value minus the next value.
 * mul (0x6) | (x y... -> x*y...) this instruction replaces the top value on the stack with the top two values multiplied together.
@@ -134,10 +135,10 @@ Programs written in the assembly language provided here are defined in two secti
 Each of these sections begins with ".declare" or ".begin" on a line by itself.
 
 <b>The .declare Section.</b>
-There are two kinds of declarations that may occur in the .declare section.
+There are four kinds of declarations that may occur in the .declare section.
 The first, a variable declaration, signals to the assembler to reserve space to be used as the variable.
-variable declarations always begin with a colon (:) and are followed by a variable name.
-variable names can include any characters except whitespace in any order.
+Variable declarations always begin with a colon (:) and are followed by a variable name.
+Variable names can include any characters except whitespace in any order.
 An example of a variable declaration is:
 <pre>:var</pre>
 In this example, a variable named :var is created.  
@@ -151,6 +152,26 @@ An example would be:
 </pre>
 In this example, a constant named two is created and is equal to 2.
 This constant can be used anywhere an address is expected, but might be particularly useful to make ldi instructions easier to read.
+
+The third kind of declaration is an array declaration.
+Array declarations reserve several contiguous memory locations for use as an array.
+An example of an array declaration is:
+<pre>
+:array length 10
+</pre>
+In this example, :array is the address of the lowest reserved cell in the array.
+The length of the array, specified after the word 'length' in this case is 10.
+
+The fourth kind of declaration is a string declaration.
+String declarations reserve contiguous memory locations and store a string in those locations.
+An example of a string declaration is:
+<pre>
+:string is 'I am happy.'
+</pre>
+In this example, :string is the address of the first character in the string 'I am happy.'
+a null character (ASCII code 0) is always appended on the end of strings created in this way.
+Please note that there are no escape sequences for strings available.
+
 
 <b>The .begin Section</b>
 The main logic of the program is found in the .begin section.
@@ -176,16 +197,17 @@ When using a label as an argument to an instruction, the colon must be included.
 
 The following list describes each instruction, its arguments (if any) and what it does.
 In the list, an argument of "number" or "address" means the instruction will accept either an integer, variable, or constant as an argument.
-If the argument is "label" the argument must be a label.  
-* jmp :label - branches to the specified label.  
+If the argument is "label" the argument must be a label. 
+Instructions indicated like this<sup>x</sup> are macros, i.e., constructed from several machine instructions.
+* jmp :label<sup>x</sup> - branches to the specified label.  
 The next instruction to be executed is the instruction that is immediately after the specified label.
-* beq :label - branches to the specified label if the top two values on the stack are equal.
+* beq :label<sup>x</sup> - branches to the specified label if the top two values on the stack are equal.
 The next instruction to be executed is the instruction that is immediately after the specified label.
 * ld address - push the value stored at the memory address specified onto the stack.
-* print - pops and prints the value on the top of the stack to the screen as a decimal number.
-* printch - pops and prints the value on the top of the stack to the screen as a ASCII character.
-* println - prints a newline to the screen.
-* read - reads a character of input from the user and pushes it on the stack<sup>2</sup>.
+* print<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a decimal number.
+* printch<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a ASCII character.
+* println<sup>x</sup> - prints a newline to the screen.
+* read<sup>x</sup> - reads a character of input from the user and pushes it on the stack<sup>2</sup>.
 * add - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
 * sub - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
 * mul - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
@@ -193,12 +215,25 @@ The next instruction to be executed is the instruction that is immediately after
 * zero - pushes the value 0 onto the stack.
 * one - pushes the value 1 onto the stack.
 * dup - pushes a copy of the value on top of the stack onto the stack.
-* dup2 - pushes a copy of the top 2 values on the stack to the top of the stack.
-* dupn - pops a number off the stack.
+* down number - moves the element on top of the stack down the specified number of elements into the stack.
+* cmp - compares the top two values on the stack, pops them both off the stack and pushes the result of the comparison.
+The comparison has three possible results.
+The result is -1 if the top value is less than the value underneath it.
+The result is 0 if both top values are equal.
+The result is 1 if the top value is greater than the value underneath it.
 Then pushes a copy of that number of top elements on the stack to the top of the stack.
 * ldi number - pushes number to the top of the stack.
 * st address - pops the top element off the stack and stores it at the specified address.
 * hlt - terminates the program.
+* jal label<sup>x</sup> - pushes the address of the next instruction on the stack and then jumps unconditionally to the address the specified label indicates.
+* ret - pops the top value off the stack and branches unconditionally to that address.
+* lda label<sup>x</sup> - pushes a value stored at a certain offset from label onto the stack.
+The offset must be pre-loaded onto the stack and is popped during the execution of this command.
+* sda label<sup>x</sup> - Pops and stores the value at the top of the stack at a specified memory location.
+The memory location is specified as the memory location specified by label plus an offset which is pre-loaded onto the stack.
+
+
+
 
 <b>Comments.</b> a comment can be made on any line by using the semicolon (;) character.  
 All text on a line after this character is ignored.
@@ -244,4 +279,3 @@ hlt        ; end of the program.
 The input is not a perfect representation of what someone should expect on real systems.</small>
 
 <sup>2</sup><small>See note 1 supra.</small>
-

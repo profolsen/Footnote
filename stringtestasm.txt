@@ -1,0 +1,25 @@
+.declare
+
+:array length 10
+:string is 'this is a string'
+:x
+
+.begin
+
+zero
+:loop
+dup
+st :x
+lda :string
+dup
+zero
+beq :end
+printch
+ld :x
+one
+add
+jmp :loop
+:end
+println
+hlt
+

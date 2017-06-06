@@ -1,4 +1,4 @@
-package emulator;
+package virtualmachine;
 
 
 import java.io.IOException;
@@ -30,6 +30,7 @@ public class StackMachine {
         stack = memoryCapacity;
     }
 
+
     public int[] memory() {
         return memory;
     }
@@ -52,14 +53,14 @@ public class StackMachine {
 
     public void push(int v) {
         if(stack == sL) {
-            throw new RuntimeException("OVERFULL STACK sL = " + sL);
+            throw new RuntimeException("OVERFULL STACK sL = " + sL + "@" + pc);
         }
         memory[--stack] = v;
     }
 
     private int pop() {
         if(stack == memory.length) {
-            throw new RuntimeException("OVER EMPTY STACK");
+            throw new RuntimeException("OVER EMPTY STACK" + "@" + pc);
         }
         int answer = memory[stack];
         stack++;
@@ -97,6 +98,8 @@ public class StackMachine {
         push(pop() / pop());
     }
 
+    private void cmp() { push(Integer.compare(pop(), pop())); }
+
     public void ld() {
         int index = adjust(memory[pc+1]);
         push(memory[index]);
@@ -105,6 +108,20 @@ public class StackMachine {
 
     private void ldi() {
         push(memory[pc+1]);
+        pc++;
+    }
+
+    private void down() {
+        int val = memory[pc+1];
+        int x = pop();
+        int[] temp = new int[val];
+        for(int i = val - 1; i >= 0; i--) {
+            temp[i] = pop();
+        }
+        push(x);
+        for(int i = 0; i < val; i++) {
+            push(temp[i]);
+        }
         pc++;
     }
 
@@ -167,6 +184,10 @@ public class StackMachine {
     }
 
     private void exec(int command) {
+        /*System.out.println("Current State of Stack Machine: ");
+        System.out.println("Memory: " + Arrays.toString(memory));
+        System.out.println("PC: " + pc);
+        System.out.println("stack: " + Arrays.toString(Arrays.copyOfRange(memory, stack, memory.length)));*/
         switch(command) {
             case 0x0:
                 jmp();
@@ -211,11 +232,16 @@ public class StackMachine {
                 pc++;
                 return;
             case 0xB:
-                dup2();
+                down();
                 pc++;
+                //swap(); retired.  too simplistic.  We need something more powerful...
+                //retired dup2() because it isn't really useful.
+                //dup2();
                 return;
             case 0xC:
-                dupn();
+                //retired dupn() becuase it isn't really useful.
+                //dupn();
+                cmp();
                 pc++;
                 return;
             case 0xD:
@@ -229,6 +255,13 @@ public class StackMachine {
             default:
                 throw new RuntimeException("Illegal Opcode: " + command);
         }
+    }
+
+    private void swap() {  //swap the order of the top two things on the stack.
+        int x = pop();
+        int y = pop();
+        push(x);
+        push(y);
     }
 
     public void run() {

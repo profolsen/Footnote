@@ -1,6 +1,7 @@
 package assembler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,18 +12,44 @@ import java.util.Scanner;
  */
 public class Assembler {
 
-    public static void main(String[] args) throws Exception {
-        Scanner scan = new Scanner(new File("program.txt"));
-        PrintStream out = new PrintStream("fib.txt");
+    public static void main(String[] args) {
+        if(args.length != 2) {
+            System.out.println("Usage: Assembler infile outfile");
+            return;
+        }
+        Scanner scan = null;
+        try {
+            scan = new Scanner(new File(args[0]));
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not open " + args[0]);
+            return;
+        }
+        PrintStream out = null;
+        try {
+            out = new PrintStream("stringtest.txt");
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not open " + args[1]);
+        }
+        ArrayList<String> program = assemble(scan);
+        //System.out.println(program);
+        for(String s : program) {
+            out.print(s + " ");
+        }
+        scan.close();
+        out.close();
+    }
+
+    public static ArrayList<String> assemble(Scanner in) {
         HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
         ArrayList<String> program = new ArrayList<String>();
         ArrayList<Integer> pc = new ArrayList<Integer>();
+        HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
         int index = 0; //the index for variable addresses.
         int variableCount = 0;
         pc.add(0);
         boolean declare = false;
-        while(scan.hasNextLine()) {
-            String line = scan.nextLine();
+        while(in.hasNextLine()) {
+            String line = in.nextLine();
             line = killComments(line).trim();
             if(line.equals("")) continue;
             if(line.equals(".declare")) {
@@ -36,6 +63,23 @@ public class Assembler {
                     variableCount++;
                 } else if(parts.length == 2) {
                     symbolTable.put(parts[0], parse(parts[1]));
+                } else if(parts.length == 3 && parts[1].equals("length")) {
+                    try {
+                        int length = Integer.parseInt(parts[2]);
+                        variableCount += length;
+                        index -= length;
+                        symbolTable.put(parts[0], index);
+                    } catch(NumberFormatException nfe) {
+                        System.out.println("Illegal array length constant: " + parts[2]);
+                    }
+                } else if(parts.length >= 3 && parts[1].equals("is")) {
+                    String[] pieces = line.split("\\s+", 3);
+                    pieces[2] = pieces[2].substring(1, pieces[2].length() - 1); //get rid of single quotes.
+                    int length = pieces[2].length() + 1;
+                    variableCount += length;
+                    index -= length;
+                    symbolTable.put(pieces[0], index);
+                    stringLocationMap.put(index, pieces[2]);
                 } else {
                     System.out.println("Illegal constant or variable declaration: " + line);
                 }
@@ -47,6 +91,17 @@ public class Assembler {
                 assemble(parts, symbolTable, program, pc);
             }
         }
+        for(int i = 0; i < variableCount; i++) {
+            program.add("0");
+        }
+        for(int i : stringLocationMap.keySet()) {
+            String s = stringLocationMap.get(i);
+            for(char c : s.toCharArray()) {
+                program.set(program.size() + i, "" + (int)c);
+                i++;
+            }
+            program.set(program.size() + i, "" + 0);
+        }
         for(int i = 0; i < program.size(); i++) {
             if(program.get(i).startsWith(":")) {
                 Integer address = symbolTable.get(program.get(i));
@@ -54,19 +109,21 @@ public class Assembler {
                     System.out.println("Undefined branch label: " + program.get(i));
                 }
                 program.set(i, "" + address);
+            } else if(program.get(i).startsWith("!")) {
+                program.set(i, program.get(i).substring(1));
+                Integer address = symbolTable.get(program.get(i));
+                if(address == null) {
+                    System.out.println("Undefined array name: " + program.get(i));
+                }
+                program.set(i, "" + (program.size() + address));
             }
         }
-        for(int i = 0; i < variableCount; i++) {
-            program.add("0");
-        }
-        //System.out.println(program);
-        for(String s : program) {
-            out.print(s + " ");
-        }
+        in.close();
+        return program;
     }
 
     private static void syntaxCheck(String[] parts) {
-        if(parts[0].equals("jmp")) {
+        if(parts[0].equals("jmp") || parts[0].equals("jal") || parts[0].equals("lda") || parts[0].equals("sda")) {
             checkThat(parts, true, true, false);
         } else if(parts[0].equals("beq")) {
             checkThat(parts, true, true, false);
@@ -78,13 +135,13 @@ public class Assembler {
             checkThat(parts, false, false, false);
         } else if(parts[0].equals("zero") || parts[0].equals("one")) {
             checkThat(parts, false, false, false);
-        } else if(parts[0].equals("dup") || parts[0].equals("dup2") || parts[0].equals("dupn")) {
+        } else if(parts[0].equals("dup") || parts[0].equals("cmp")) {
             checkThat(parts, false, false, false);
-        } else if(parts[0].equals("ldi")) {
+        } else if(parts[0].equals("ldi") || parts[0].equals("down")) {
             checkThat(parts, true, true, true);
         } else if(parts[0].equals("st")) {
             checkThat(parts, true, true, true);
-        } else if(parts[0].equals("hlt")) {
+        } else if(parts[0].equals("hlt") || parts[0].equals("ret")) {
             checkThat(parts, false, false, false);
         } else {
             System.out.println("Undefined Instruction: " + parts[0]);
@@ -117,10 +174,20 @@ public class Assembler {
         if(parts[0].equals("dup")) {
             program.add("" + 0xA);
             inc(pc);
-        } else if(parts[0].equals("dup2")) {
+        } else if(parts[0].equals("down")) {//retiring dup2... if(parts[0].equals("dup2")) {
             program.add("" + 0xB);
             inc(pc);
-        } else if(parts[0].equals("dupn")) {
+            if(parts[1].startsWith(":")) {
+                Integer value = symbolTable.get(parts[1]);
+                if(value == null) {
+                    System.out.println("Undefined constant: " + parts[1]);
+                }
+                program.add("" + value);
+            } else {
+                program.add(parts[1]);
+            }
+            inc(pc);
+        } else if(parts[0].equals("cmp")) {//retiring dupn... if(parts[0].equals("dupn")) {
             program.add("" + 0xC);
             inc(pc);
         } else if(parts[0].equals("add")) {
@@ -240,7 +307,72 @@ public class Assembler {
         } else if(parts[0].equals("zero")) {
             program.add("" + 0x8);
             inc(pc);
+        } else if(parts[0].equals("jal")) {
+            program.add("" + 0xD);
+            inc(pc);
+            inc(pc);
+            inc(pc);
+            inc(pc);
+            inc(pc);  //we need to do incrementing before the linking, so we link back to the correct location.
+            program.add("" + pc.get(0)); //should return to this location...
+            Integer address = symbolTable.get(parts[1]);
+            program.add("" + 0xD);
+            if(address == null)
+            {
+                program.add(parts[1]);
+            } else {
+                program.add("" + address);
+            }
+            program.add("" + 0x0);
+        } else if(parts[0].equals("lda")) {
+            String base = "!"+parts[1];  //base has to come this way.
+            //we have to assume that index is on the stack already.
+            program.add("" + 0xD);   //load the base address onto stack.
+            inc(pc);
+            program.add(base);       //the base address....
+            inc(pc);
+            program.add("" + 0x4);   //add the base address to whatever was already on the stack...
+            inc(pc);
+            program.add("" + 0xE);   //store the calculated address as a target to load.
+            inc(pc);
+            inc(pc);
+            inc(pc);
+            program.add("" + pc.get(0)); //where we are storing the value.
+            program.add("" + 0x2);    //the load instruction.
+            program.add("" + 0x0);  //this value should be overriden by the store instruction above.
+            inc(pc);
 
+        } else if(parts[0].equals("sda")) {
+            String base = "!"+parts[1];  //base has to come this way.
+            //we have to assume that index is on the stack already.
+            program.add("" + 0xD);   //load the base address onto stack.
+            inc(pc);
+            program.add(base);       //the base address....
+            inc(pc);
+            program.add("" + 0x4);   //add the base address to whatever was already on the stack...
+            inc(pc);
+            program.add("" + 0xE);   //store the calculated address as a target to load.
+            inc(pc);
+            inc(pc);
+            inc(pc);
+            program.add("" + pc.get(0)); //where we are storing the value.
+            program.add("" + 0xE);    //the store instruction.
+            program.add("" + 0x0);  //this value should be overriden by the store instruction above.
+            inc(pc);
+
+        } else if(parts[0].equals("ret")) {
+            program.add("" + 0x0);
+            inc(pc);
+        }
+    }
+
+    private static String lookUp(HashMap<String, Integer> symbolTable, String name) {
+        Integer value = symbolTable.get(name);
+        if(value == null)
+        {
+            return name;
+        } else {
+            return "" + value;
         }
     }
 
