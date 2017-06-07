@@ -1,8 +1,9 @@
 # Footnote
 
 <b>Name</b>
+
 The project is called Footnote for two reasons:
-1. Just like a footnote, the set of instructions the Footnote VM supports is extremely small.
+1. Just like a footnote, the set of instructions supported by the Footnote VM is extremely small.
 2. This project began as a footnote to a different project I was working on at the time but took on a life of it's own, very much like the footnotes of [David Foster Wallace](https://en.wikipedia.org/wiki/David_Foster_Wallace).
 
 
