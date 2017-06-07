@@ -1,26 +1,29 @@
-# stackmachine      
+# Footnote
 
 
-Chip Architecture
+Virtual Machine Architecture
 -----------------
 
-The chip the project simulates is simple (There are only sixteen instructions - see below) but powerful (This limited set of instructions is powerful enough to write any program).
-The chip operates on 32-bit integers and assumes a memory of 256 integers (although this is expanded on some systems).
+The Footnote Virtual Machine is simple (There are only sixteen instructions - see below) but powerful (This limited set of instructions is powerful enough to write any program).
+Footnote VM operates on 32-bit integers and allows the user to set the memory with a command line argument.
 
-<b>Chip Basics.</b>
-1. stack.  The chip does not have usable registers; instead, a stack is provided.
+<b>Virtual Machine Basics.</b>
+1. stack.  
+The virtual machine does not have usable registers; instead, a stack is provided.
 The stack always starts at the highest memory location (i.e. the bottom of the stack is always at the highest memory address).
-As elements are pushed onto the stack, the stack grows downward. 
+As elements are pushed onto the stack, the stack grows toward memory address 0. 
 The location of the top of the stack is stored in a register called 'stack'.
-2. maximum stack height.  The chip's stack has a capacity that is determined when the program is loaded into main memory.
+2. maximum stack height.  
+FootnoteVM's stack has a capacity that is determined when the program is loaded into main memory.
 The maximum stack height is always equal to the maximum memory address minus the number of integers in the specified program.
 In other words, the maximum stack height is equal to the maximum memory address minus the number of integers used to define the Executable and Data Sections of a program (see <b>Program Basics</b> below).
-3. sequential execution.  Instructions from a program are executed in a sequential order, except in the case of jmp and beq.
+3. sequential execution.  
+Machine instructions from a program are executed in a sequential order, except in the case of jmp and beq (see <b>Instructions</b> below).
 These two instructions allow the user to set the next instruction address to be any arbitrary value (as long as the value is a valid address).
 The program counter keeps of the next instruction's address using a special register, called pc.
 
 <b>Program Basics.</b>
-Each program written to be executed on the chip contains three sections:
+Each program written to be executed on the contains three sections:
 1. Called the Executable Section, this first section contains all the executable code of the program.
 This part of the program begins with the first integer of the program and continues until the first initialization of the data section.
 It is best practice to explicitly terminate this section with a hlt instruction (so that it is clear where the next section starts), but it is not an error to terminate in some other way.
@@ -28,7 +31,7 @@ It is best practice to explicitly terminate this section with a hlt instruction 
 The final integers of the program make up this section beginning after the last instruction.
 3. The final section of each program is the Stack Section.
 Unlike the Data section which must be explicitly initialized by the user, the stack section is always taken to be the rest of available memory not used by the previous two sections.
-For example, if the first two sections together use 130 integers of memory, then the stack section will comprise the remaining 126 integers of memory.
+For example, if the first two sections together use 130 integers of memory, then the stack section will comprise the remaining 126 integers of memory, assuming there are 256 integers of memory in total.
 
 <b>Instructions.</b>
 Each instruction will be defined and discussed using the format described below:
@@ -37,8 +40,8 @@ Each instruction will be defined and discussed using the format described below:
 Each list item begins by giving the name and the opcode (in hexadecimal) for the instruction.
 Then, the arguments taken by the instruction are given.
 There are no instructions with optional arguments.
-If a instruction takes arguments, they must be given.
-After the pipe, the effect of the instruction on the stack (if there is one) is specified.  
+If an instruction takes arguments, they must be given.
+After the vertical bar "<b>|</b>", the effect of the instruction on the stack (if there is one) is specified.  
 The effect is described by providing a before and after picture of the stack relative to the instruction being discussed.
 On the left, the before image of the stack is given by the first or first few items on the stack followed by an ellipsis (...) representing the rest of the items on the stack.
 On the right, the after image of the stack is given by redrawing the first few items of the stack after the instruction is performed, again followed by an ellipsis.
@@ -70,7 +73,9 @@ Like ld, this instruction operates in two modes, see ld for details.
 * hlt (0x15) |  this instruction signals the end of a program.
 * ldi val (0xD) | (... -> val...) this instruction pushes the next value onto the stack.
 
-<b>Wait... No Pop?</b>
+<!---The following removed because isn't that part of the fun of programming?
+     (To figure out how to do tricky but potentially useful things?--->
+<!---<b>Wait... No Pop?</b>
 It is true that there is no pop instruction.  With good memory management, being able to pop a value of the stack is unnecessary.  However, if popping is something you just can't do without, the following sequence of instructions will pop a value off the stack: 
 0. -> x y...
 1. dup -> x x y...
@@ -78,10 +83,10 @@ It is true that there is no pop instruction.  With good memory management, being
 3. sub -> -x x y...
 4. add -> 0 y...
 5. add -> y...
-
+<!---
 The disclaimer here is of course that this only works if there's more than one value on the stack.
 This problem can be easily avoided by just pushing a zero on the stack at the beginning of program execution.
-
+--->
 
 <b>System Calls.</b>
 When describing various system calls, the following format is used:
@@ -95,13 +100,13 @@ After the code and arguments list, the action of the call is described.
 * 0x2 () - Interprets the value on top of the stack as an ASCII character and then prints it to the screen.
 * 0x3 () - prints a newline character to the screen.
 * 0x4 () - user input through keyboard.
-An integer corresponding to a typed key is pushed on the stack<sup>1</sup>.
+An integer corresponding to a typed key is pushed on the stack.
 the integer-key mapping is system dependent.
 
 <b>Example Program (Fibonacci Numbers).</b>
 The following program is designed to print out the first few fibonacci numbers (up through 233).
-The following program is formatted like this: <pre>instruction(s) //comments appear like this.</pre>
-Comments are not allowed in programs written for this chip, but are provided for explanation only.
+The following program is formatted like this: <pre>instruction op code and argument //comments appear like this.</pre>
+Comments are not allowed in programs written for this FootnoteVM, but are provided for explanation only.
 <pre>
 8 //pushes 0 on to the stack
 9 //pushes 1 on to the stack
@@ -124,10 +129,10 @@ Comments are not allowed in programs written for this chip, but are provided for
 0 //variable, address 29.
 //the remaining memory addresses will be potentially used by the stack</pre>.
 
-Assembler
----------
+FootnoteVM Assembler
+-------------------
 
-An assembler is included with this project to facilitate the writing of programs for the chip.
+An assembler is included to facilitate the writing of programs for FootnoteVM.
 Programs written in the assembly language provided here are defined in two sections.
 1. The .declare section is used to define constants and variables.
 2. The .begin section is used to store the code to be executed.
@@ -178,7 +183,7 @@ The main logic of the program is found in the .begin section.
 Each line in the .begin section is either (1) a line containing any combination of only whitespace and and a comment ("blank lines"), (2) a line containing code to be assembled, or (3) a label.
 Blank lines are ignored by the assember.
 A line containing code always begins with the name of a valid instruction.
-Valid instruction names are jmp, beq, ld, print, println, printch add, sub, mul, div, zero, one, dup, dup2, dupn, st, ldi, and hlt.
+Valid instruction names are jmp, beq, ld, print, println, printch add, sub, mul, div, zero, one, dup, down, cmp, st, ldi, hlt, jal, read, ret, lda, and sda
 If the instruction requires arguments, arguments follow.
 A line may also be a label.
 A label is used to indicate the destination of a branching (beq) or jumping (jmp) instruction.
@@ -207,7 +212,7 @@ The next instruction to be executed is the instruction that is immediately after
 * print<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a decimal number.
 * printch<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a ASCII character.
 * println<sup>x</sup> - prints a newline to the screen.
-* read<sup>x</sup> - reads a character of input from the user and pushes it on the stack<sup>2</sup>.
+* read<sup>x</sup> - reads a character of input from the user and pushes it on the stack.
 * add - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
 * sub - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
 * mul - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
@@ -274,8 +279,3 @@ jmp :loop  ; ...else goto loop (stay in the loop).
 hlt        ; end of the program.
 
 </pre>
-
-<sup>1</sup><small>This emulator uses java's System.in to handle input.  
-The input is not a perfect representation of what someone should expect on real systems.</small>
-
-<sup>2</sup><small>See note 1 supra.</small>
