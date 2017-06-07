@@ -1,6 +1,7 @@
 # Footnote
 
-<b>Name</b>
+Name
+-----
 
 The project is called Footnote for two reasons:
 1. Just like a footnote, the set of instructions supported by the Footnote VM is extremely small.
@@ -285,3 +286,8 @@ jmp :loop  ; ...else goto loop (stay in the loop).
 hlt        ; end of the program.
 
 </pre>
+
+License
+-------
+
+This project is made available under the [MIT License](https://github.com/profolsen/Footnote/blob/master/License.txt). 
