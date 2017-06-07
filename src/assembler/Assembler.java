@@ -6,11 +6,14 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 /**
  * Created by po917265 on 6/3/17.
  */
 public class Assembler {
+
+    static int lineNo = 1;
 
     public static void main(String[] args) {
         if(args.length != 2) {
@@ -40,10 +43,12 @@ public class Assembler {
     }
 
     public static ArrayList<String> assemble(Scanner in) {
+        lineNo = 1;
         HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
         ArrayList<String> program = new ArrayList<String>();
         ArrayList<Integer> pc = new ArrayList<Integer>();
         HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
+        TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
         int index = 0; //the index for variable addresses.
         int variableCount = 0;
         pc.add(0);
@@ -70,7 +75,7 @@ public class Assembler {
                         index -= length;
                         symbolTable.put(parts[0], index);
                     } catch(NumberFormatException nfe) {
-                        System.out.println("Illegal array length constant: " + parts[2]);
+                        System.out.println("Illegal array length constant @" + lineNo);
                     }
                 } else if(parts.length >= 3 && parts[1].equals("is")) {
                     String[] pieces = line.split("\\s+", 3);
@@ -81,15 +86,17 @@ public class Assembler {
                     symbolTable.put(pieces[0], index);
                     stringLocationMap.put(index, pieces[2]);
                 } else {
-                    System.out.println("Illegal constant or variable declaration: " + line);
+                    System.out.println("Illegal constant or variable declaration @" + lineNo);
                 }
             } else if(line.startsWith(":")) {
                 symbolTable.put(line, pc.get(0));
             } else {
                 String[] parts = line.split("\\s+");
                 syntaxCheck(parts);
+                pc2line.put(pc.get(0), lineNo);
                 assemble(parts, symbolTable, program, pc);
             }
+            lineNo++;
         }
         for(int i = 0; i < variableCount; i++) {
             program.add("0");
@@ -106,16 +113,17 @@ public class Assembler {
             if(program.get(i).startsWith(":")) {
                 Integer address = symbolTable.get(program.get(i));
                 if(address == null) {
-                    System.out.println("Undefined branch label: " + program.get(i));
+                    System.out.println("Undefined branch label @" + pc2line.get(pc2line.floorKey(i)));
                 }
                 program.set(i, "" + address);
             } else if(program.get(i).startsWith("!")) {
                 program.set(i, program.get(i).substring(1));
                 Integer address = symbolTable.get(program.get(i));
                 if(address == null) {
-                    System.out.println("Undefined array name: " + program.get(i));
+                    System.out.println("Undefined array name: @" + pc2line.get(pc2line.floorKey(i)));
+                } else {
+                    program.set(i, "" + (program.size() + address));
                 }
-                program.set(i, "" + (program.size() + address));
             }
         }
         in.close();
@@ -144,20 +152,20 @@ public class Assembler {
         } else if(parts[0].equals("hlt") || parts[0].equals("ret")) {
             checkThat(parts, false, false, false);
         } else {
-            System.out.println("Undefined Instruction: " + parts[0]);
+            System.out.println("Undefined Instruction @" + lineNo);
         }
     }
 
     private static void checkThat(String[] parts, boolean takesArguments, boolean takesLabels, boolean takesAddresses) {
         if(parts.length !=  (takesArguments ? 2 : 1)) {
-            System.out.println("Incorrect argument count: " + parts[0]);
+            System.out.println("Incorrect argument count @" + lineNo);
             return;
         }
         if(!takesArguments) return;
         boolean label = parts[1].startsWith(":");
         boolean number = parses(parts[1]);
         if(!((takesLabels & label) || takesAddresses & number)) {
-            System.out.println("Incorrect argument type: " + parts[1]);
+            System.out.println("Incorrect argument type: @" + lineNo);
         }
     }
 
@@ -180,7 +188,7 @@ public class Assembler {
             if(parts[1].startsWith(":")) {
                 Integer value = symbolTable.get(parts[1]);
                 if(value == null) {
-                    System.out.println("Undefined constant: " + parts[1]);
+                    System.out.println("Undefined constant @" + lineNo);
                 }
                 program.add("" + value);
             } else {
@@ -213,7 +221,7 @@ public class Assembler {
 //            System.out.println(parts[1] + " :: " + symbolTable.get(parts[1]));
             if(address == null)
             {
-                System.out.println("Undefined variable: " + parts[1]);
+                System.out.println("Undefined variable @" + lineNo);
             }
             inc(pc);
             program.add("" + address);
@@ -224,7 +232,7 @@ public class Assembler {
             Integer address = symbolTable.get(parts[1]);
             if(address == null)
             {
-                System.out.println("Undefined variable: " + parts[1]);
+                System.out.println("Undefined variable: @" + lineNo);
             }
             inc(pc);
             program.add("" + address);
@@ -235,7 +243,7 @@ public class Assembler {
             if(parts[1].startsWith(":")) {
                 Integer value = symbolTable.get(parts[1]);
                 if(value == null) {
-                    System.out.println("Undefined constant: " + parts[1]);
+                    System.out.println("Undefined constant @" + lineNo);
                 }
                 program.add("" + value);
             } else {
@@ -392,7 +400,7 @@ public class Assembler {
         try {
             return Integer.parseInt(number);
         } catch(Exception e) {
-            System.out.println("Expected a number but instead saw: " + number);
+            System.out.println("Invalid integer value @" + lineNo);
             return Integer.MIN_VALUE;
         }
     }

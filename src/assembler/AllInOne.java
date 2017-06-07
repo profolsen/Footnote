@@ -28,7 +28,12 @@ public class AllInOne {
             ArrayList<String> program = Assembler.assemble(scan);
             StackMachine machine = new StackMachine(memoryCapacity);
             for(String s : program) {
-                machine.load(Integer.parseInt(s));
+                try {
+                    machine.load(Integer.parseInt(s));
+                } catch(NumberFormatException nfe) {
+                    System.out.println("Invalid program");
+                    return;
+                }
             }
             machine.run();
         } catch (FileNotFoundException e) {

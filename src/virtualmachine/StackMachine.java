@@ -13,7 +13,7 @@ public class StackMachine {
 
     //private LinkedList<Integer> stack;
 
-    private int[] memory;
+    private Memory memory;
 
     private int sL; //how low the stack counter can go.
 
@@ -25,14 +25,9 @@ public class StackMachine {
 
     public StackMachine(int memoryCapacity) {
         //stack = new LinkedList<Integer>();
-        memory = new int[memoryCapacity];
+        memory = new Memory(memoryCapacity);
         pc = 0;
         stack = memoryCapacity;
-    }
-
-
-    public int[] memory() {
-        return memory;
     }
 
     public int pc() { return pc; }
@@ -53,16 +48,18 @@ public class StackMachine {
 
     public void push(int v) {
         if(stack == sL) {
-            throw new RuntimeException("OVERFULL STACK sL = " + sL + "@" + pc);
+            System.out.println("Overfull stack @" + pc);
+            System.exit(0);
         }
-        memory[--stack] = v;
+        memory.set(--stack, v);
     }
 
     private int pop() {
-        if(stack == memory.length) {
-            throw new RuntimeException("OVER EMPTY STACK" + "@" + pc);
+        if(stack == memory.capacity()) {
+            System.out.println("Over empty stack @" + pc);
+            System.exit(0);
         }
-        int answer = memory[stack];
+        int answer = memory.get(stack);
         stack++;
         return answer;
     }
@@ -101,18 +98,18 @@ public class StackMachine {
     private void cmp() { push(Integer.compare(pop(), pop())); }
 
     public void ld() {
-        int index = adjust(memory[pc+1]);
-        push(memory[index]);
+        int index = adjust(memory.get(pc+1));
+        push(memory.get(index));
         pc++;  //must skip the next command...
     }
 
     private void ldi() {
-        push(memory[pc+1]);
+        push(memory.get(pc+1));
         pc++;
     }
 
     private void down() {
-        int val = memory[pc+1];
+        int val = memory.get(pc+1);
         int x = pop();
         int[] temp = new int[val];
         for(int i = val - 1; i >= 0; i--) {
@@ -149,7 +146,7 @@ public class StackMachine {
     }
 
     public void sys() {
-        int code = memory[++pc];
+        int code = memory.get(++pc);
         switch(code) {
             case 0x1 : //printing an integer in decimal.
                 //System.out.println("Printing a number to screen...");
@@ -166,20 +163,21 @@ public class StackMachine {
                     int x = System.in.read();
                     push(x);
                 } catch (IOException e) {
-                    System.out.println("IO ERROR");
+                    System.out.println("IO error");
+                    System.exit(0);
                 }
             break;
             case 0x0 : //print out debug info... non standard!
                 System.out.println("Current State of Stack Machine: ");
-                System.out.println("Memory: " + Arrays.toString(memory));
+                System.out.println("Memory: " + memory);
                 System.out.println("PC: " + pc);
-                System.out.println("stack: " + Arrays.toString(Arrays.copyOfRange(memory, stack, memory.length)));
+                System.out.println("stack: " + Arrays.toString(memory.from(stack)));
                 break;
         }
     }
 
     public void st() {
-        memory[adjust(memory[pc+1])] = pop();
+        memory.set(adjust(memory.get(pc+1)), pop());
         pc++; //pc must be incremented twice in this case.
     }
 
@@ -253,7 +251,8 @@ public class StackMachine {
                 pc++;
                 return;
             default:
-                throw new RuntimeException("Illegal Opcode: " + command);
+               System.out.println("Illegal Opcode: " + command);
+               System.exit(0);
         }
     }
 
@@ -265,18 +264,18 @@ public class StackMachine {
     }
 
     public void run() {
-        int command = memory[pc];
+        int command = memory.get(pc);
         int count = 0;
         while (command != 0xF) { //while command is not the halt command...
             exec(command);
-            command = memory[pc];
+            command = memory.get(pc);
             //System.out.println("\tcmd:" + command + "@" + pc);
             count++;
         }
     }
 
     public void load(int i) {
-        memory[index++] = i;
+        memory.set(index++, i);
         sL = index;
     }
 
