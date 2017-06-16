@@ -10,7 +10,17 @@ import java.util.*;
  */
 public class Assembler {
 
-    static int lineNo = 1;
+    private int lineNo = 1;
+    private HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
+    private ArrayList<String> program = new ArrayList<String>();
+    private int pc = 0;
+    private HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
+    private TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
+    private Scanner in;
+
+    public Assembler(Scanner source) {
+        in = source;
+    }
 
     public static void main(String[] args) {
         if(args.length != 2) {
@@ -30,7 +40,8 @@ public class Assembler {
         } catch (FileNotFoundException e) {
             System.out.println("Could not open " + args[1]);
         }
-        ArrayList<String> program = assemble(scan);
+        Assembler assembler = new Assembler(scan);
+        ArrayList<String> program = assembler.assemble();
         //System.out.println(program);
         for(String s : program) {
             out.print(s + " ");
@@ -39,8 +50,7 @@ public class Assembler {
         out.close();
     }
 
-    public static ArrayList<String> assemble(Scanner in) {
-        lineNo = 1;
+    public ArrayList<String> assemble() {
         HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
         ArrayList<String> program = new ArrayList<String>();
         ArrayList<Integer> pc = new ArrayList<Integer>();
@@ -127,7 +137,7 @@ public class Assembler {
         return program;
     }
 
-    private static void syntaxCheck(String[] parts) {
+    private void syntaxCheck(String[] parts) {
         try { //try to syntax check the instruction.
             Instruction instruction = Instruction.valueOf(parts[0]);
             instruction.checkSyntax(parts, System.out, lineNo);
@@ -136,7 +146,7 @@ public class Assembler {
         }
     }
 
-    private static void assemble(String[] parts, HashMap<String, Integer> symbolTable, ArrayList<String> program, ArrayList<Integer> pc) {
+    private void assemble(String[] parts, HashMap<String, Integer> symbolTable, ArrayList<String> program, ArrayList<Integer> pc) {
         try {
             Instruction instruction = Instruction.valueOf(parts[0]);
             String[] assembled = instruction.assemble(parts, symbolTable, pc.get(0), System.out, lineNo);
@@ -158,7 +168,7 @@ public class Assembler {
         return line.substring(0, line.indexOf(';') - 1);
     }
 
-    public static int parse(String number) {
+    public int parse(String number) {
         try {
             return Integer.parseInt(number);
         } catch(Exception e) {
