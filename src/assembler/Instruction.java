@@ -13,112 +13,112 @@ public enum Instruction {
     jal(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[6];
-            ans[1] = "" + 0xD;
-            pc += 5;  //do incrementing now so that we return to the right place.
-            ans[2] = "" + pc;//should return to this location...
+            String[] ans = new String[5];
+            ans[0] = ("" + 0xD);
+            //we need to do incrementing before the linking, so we link back to the correct location.
+            pc+= 5;
+            ans[1] = ("" + pc); //should return to this location...
             Integer address = symbolTable.get(parts[1]);
-            ans[3] = "" + 0xD;
+            ans[2] = ("" + 0xD);
             if(address == null)
             {
-                ans[4] = parts[1];
+                ans[3] = (parts[1]);
             } else {
-                ans[4] = "" + address;
+                ans[3] = ("" + address);
             }
-            ans[5] = "" + 0x0;
-            ans[0] = "" + pc;
+            ans[4] = ("" + 0x0);
             return ans;
         }
     },
     jmp(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[4];
+            String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
-            ans[1] = "" + 0xD;
+            ans[0] = "" + 0xD;
             pc++;
             if(address == null)
             {
-                ans[2] = parts[1];
+                ans[1] = parts[1];
             } else {
-                ans[2] = "" + address;
+                ans[1] = "" + address;
             }
             pc++;
-            ans[3] = "" + 0x0;
+            ans[2] = "" + 0x0;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     lda(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[8];
+            String[] ans = new String[7];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
-            ans[1] = "" + 0xD;   //load the base address onto stack.
+            ans[0] = "" + 0xD;   //load the base address onto stack.
             pc++;
-            ans[2] = "" + base;       //the base address....
+            ans[1] = "" + base;       //the base address....
             pc++;
-            ans[3] = "" + 0x4;   //add the base address to whatever was already on the stack...
+            ans[2] = "" + 0x4;   //add the base address to whatever was already on the stack...
             pc++;
-            ans[4] = "" + 0xE;   //store the calculated address as a target to load.
+            ans[3] = "" + 0xE;   //store the calculated address as a target to load.
             pc += 3;
-            ans[5] = "" + pc; //where we are storing the value.
-            ans[6] = "" + 0x2;    //the load instruction.
-            ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
+            ans[4] = "" + pc; //where we are storing the value.
+            ans[5] = "" + 0x2;    //the load instruction.
+            ans[6] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     sda(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[x];
+            String[] ans = new String[7];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
-            ans[1] = "" + 0xD;   //load the base address onto stack.
+            ans[0] = "" + 0xD;   //load the base address onto stack.
             pc++;
-            ans[2] = "" + base;       //the base address....
+            ans[1] = "" + base;       //the base address....
             pc++;
-            ans[3] = "" + 0x4;   //add the base address to whatever was already on the stack...
+            ans[2] = "" + 0x4;   //add the base address to whatever was already on the stack...
             pc++;
-            ans[4] = "" + 0xE;   //store the calculated address as a target to load.
+            ans[3] = "" + 0xE;   //store the calculated address as a target to load.
             pc += 3;
-            ans[5] = "" + pc; //where we are storing the value.
-            ans[6] = "" + 0xE;    //the store instruction.
-            ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
+            ans[4] = "" + pc; //where we are storing the value.
+            ans[5] = "" + 0xE;    //the store instruction.
+            ans[6] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     beq(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[4];
+            String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
-            ans[1] = "" + 0xD;
+            ans[0] = "" + 0xD;
             pc++;
             if(address == null)
             {
-                ans[2] = parts[1];
+                ans[1] = parts[1];
             } else {
-                ans[2] = "" + address;
+                ans[1] = "" + address;
             }
             pc++;
-            ans[3] = ("" + 0x1);
+            ans[2] = ("" + 0x1);
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     ld(true, true) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x2);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x2);
             pc++;
             Integer address = symbolTable.get(parts[1]);
 //            System.out.println(symbolTable);
@@ -128,19 +128,19 @@ public enum Instruction {
                 error.println("Undefined variable @" + lineno);
             }
             pc++;
-            ans[2] = ("" + address);
-            ans[0] = "" + pc;
+            ans[1] = ("" + address);
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     print(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x3);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x3);
             pc++;
-            ans[2] = ("" + 0x1);
-            ans[0] = "" + pc;
+            ans[1] = ("" + 0x1);
+            //ans[0] = "" + pc;
             return ans;
 
         }
@@ -148,156 +148,199 @@ public enum Instruction {
     println(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x3);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x3);
             pc++;
-            ans[2] = ("" + 0x3);
-            ans[0] = "" + pc;
+            ans[1] = ("" + 0x3);
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     printch(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x3);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x3);
             pc++;
-            ans[2] = ("" + 0x2);
-            ans[0] = "" + pc;
+            ans[1] = ("" + 0x2);
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     read(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x3);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x3);
             pc++;
-            ans[2] = ("" + 0x4);
-            ans[0] = "" + pc;
+            ans[1] = ("" + 0x4);
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     diagnostics(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[3];
-            ans[1] = ("" + 0x3);
+            String[] ans = new String[2];
+            ans[0] = ("" + 0x3);
             pc++;
-            ans[2] = ("" + 0x0);
-            ans[0] = "" + pc;
+            ans[1] = ("" + 0x0);
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     add(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x4;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x4;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     sub(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x5;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x5;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     mul(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x6;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x6;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     div(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x7;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x7;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     zero(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x8;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x8;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     one(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0x9;
+            String[] ans = new String[1];
+            ans[0] = "" + 0x9;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     dup(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0xA;
+            String[] ans = new String[1];
+            ans[0] = "" + 0xA;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     cmp(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0xC;
+            String[] ans = new String[1];
+            ans[0] = "" + 0xC;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
-    ldi(true, true),
+    ldi(true, true) {
+        @Override
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+            String[] ans = new String[2];
+            ans[0] = ("" + 0xD);
+            pc++;
+            if(parts[1].startsWith(":")) {
+                Integer value = symbolTable.get(parts[1]);
+                if(value == null) {
+                    safePrint(error, "Undefined constant @" + lineno);
+                }
+                ans[1] = ("" + value);
+            } else {
+                ans[1] = (parts[1]);
+            }
+            pc++;
+            //ans[0] = "" + pc;
+            return ans;
+        }
+    },
     down(true, true) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
             String[] ans = new String[2];
-            ans[1] = "" + 0xB;
+            ans[0] = ("" + 0xB);
             pc++;
-            ans[0] = "" + pc;
+            if(parts[1].startsWith(":")) {
+                Integer value = symbolTable.get(parts[1]);
+                if(value == null) {
+                    safePrint(error, "Undefined constant @" + lineno);
+                }
+                ans[1] = ("" + value);
+            } else {
+                ans[1] = (parts[1]);
+            }
+            pc++;
             return ans;
         }
     },
-    st(true, true),
-    ret(false, false) {
+    st(true, true) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
             String[] ans = new String[2];
-            ans[1] = "" + 0x0;
+            ans[0] = ("" + 0xE);
             pc++;
-            ans[0] = "" + pc;
+            Integer address = symbolTable.get(parts[1]);
+            if(address == null)
+            {
+                System.out.println("Undefined variable: @" + lineno);
+            }
+            pc++;
+            ans[1] = ("" + address);
+            return ans;
+        }
+    },
+    ret(false, false) {
+        @Override
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+            String[] ans = new String[1];
+            ans[0] = "" + 0x0;
+            pc++;
+            //ans[0] = "" + pc;
             return ans;
         }
     },
     hlt(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[1] = "" + 0xF;
+            String[] ans = new String[1];
+            ans[0] = "" + 0xF;
             pc++;
-            ans[0] = "" + pc;
+            //ans[0] = "" + pc;
             return ans;
         }
     };
@@ -361,7 +404,7 @@ public enum Instruction {
      * @param error
      * @param s
      */
-    private void safePrint(PrintStream error, String s) {
+    private static void safePrint(PrintStream error, String s) {
         if(error != null) {
             error.println(s);
         }
@@ -380,4 +423,25 @@ public enum Instruction {
      * as symbols.
      */
     public abstract String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno);
+
+    /**
+     * This method is to get rid of unused field warnings for the members of this enum.
+     * It has no other purpose and should never be used.
+     */
+    private static void getRidOfUnusedFieldWarnings() {
+        Instruction s = jal; s = jmp; s = beq; s = add; s = sub; s = mul; s = div; s = cmp;
+        s = ret; s = ldi; s = lda; s = sda; s = st; s = dup; s = down; s = print; s = printch;
+        s = read; s = diagnostics; s = zero; s = one; s = ld; s = hlt; s = println;
+        getRidOfUnusedFieldWarnings_helper();
+
+    }
+
+    /**
+     * This method is used to get rid of unused warning on getRidOfUnusedFieldWarnings.
+     * This method has no other purpose and should never be used.
+     * It is also infinitely recursive ...so yeah.
+     */
+    private static void getRidOfUnusedFieldWarnings_helper() {
+        getRidOfUnusedFieldWarnings();
+    }
 }
