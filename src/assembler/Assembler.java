@@ -132,7 +132,7 @@ public class Assembler {
 
     private static void syntaxCheck(String[] parts) {
         try { //try to syntax check the instruction.
-            InstructionSyntax is = InstructionSyntax.valueOf(parts[0]);
+            Instruction is = Instruction.valueOf(parts[0]);
             is.checkSyntax(parts, System.out, lineNo);
         } catch(IllegalArgumentException iae) {  //invalid instruction name.  Report this.
             System.out.println("Undefined Instruction " + parts[0] + " @" + lineNo);
