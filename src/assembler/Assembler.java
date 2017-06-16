@@ -13,10 +13,12 @@ public class Assembler {
     private int lineNo = 1;
     private HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
     private ArrayList<String> program = new ArrayList<String>();
-    private int pc = 0;
+    private ArrayList<Integer> pc = new ArrayList<Integer>();     //this should really be an integer, but that seems to cause errors.
     private HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
     private TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
     private Scanner in;
+    private int variableCount = 0;
+    private int index = 0;
 
     public Assembler(Scanner source) {
         in = source;
@@ -51,13 +53,7 @@ public class Assembler {
     }
 
     public ArrayList<String> assemble() {
-        HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
-        ArrayList<String> program = new ArrayList<String>();
-        ArrayList<Integer> pc = new ArrayList<Integer>();
-        HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
-        TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
-        int index = 0; //the index for variable addresses.
-        int variableCount = 0;
+        //ArrayList<Integer> pc = new ArrayList<Integer>();
         pc.add(0);
         boolean declare = false;
         while(in.hasNextLine()) {
