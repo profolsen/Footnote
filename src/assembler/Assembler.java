@@ -13,7 +13,7 @@ public class Assembler {
     private int lineNo = 1;
     private HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
     private ArrayList<String> program = new ArrayList<String>();
-    private int pc;
+    private int pc = 0;
     private HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
     private TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
     private Scanner in;
@@ -43,7 +43,8 @@ public class Assembler {
             System.out.println("Could not open " + args[1]);
         }
         Assembler assembler = new Assembler(scan);
-        ArrayList<String> program = assembler.assemble();
+        assembler.assemble();
+        ArrayList<String> program = assembler.program();
         //System.out.println(program);
         for(String s : program) {
             out.print(s + " ");
@@ -52,66 +53,19 @@ public class Assembler {
         out.close();
     }
 
-    public ArrayList<String> assemble() {
+    //a two pass assembler.
+    public void assemble() {
         //ArrayList<Integer> pc = new ArrayList<Integer>();
-        pc = 0;
-        boolean declare = false;
-        while(in.hasNextLine()) {
-            String line = in.nextLine();
-            line = killComments(line).trim();
-            if(line.equals("")) continue;
-            if(line.equals(".declare")) {
-                declare = true;
-            } else if(line.equals(".begin")) {
-                declare = false;
-            } else if(declare) {
-                String[] parts = line.split("\\s+");
-                if(parts.length == 1) {
-                    symbolTable.put(line, --index);
-                    variableCount++;
-                } else if(parts.length == 2) {
-                    symbolTable.put(parts[0], parse(parts[1]));
-                } else if(parts.length == 3 && parts[1].equals("length")) {
-                    try {
-                        int length = Integer.parseInt(parts[2]);
-                        variableCount += length;
-                        index -= length;
-                        symbolTable.put(parts[0], index);
-                    } catch(NumberFormatException nfe) {
-                        System.out.println("Illegal array length constant @" + lineNo);
-                    }
-                } else if(parts.length >= 3 && parts[1].equals("is")) {
-                    String[] pieces = line.split("\\s+", 3);
-                    pieces[2] = pieces[2].substring(1, pieces[2].length() - 1); //get rid of single quotes.
-                    int length = pieces[2].length() + 1;
-                    variableCount += length;
-                    index -= length;
-                    symbolTable.put(pieces[0], index);
-                    stringLocationMap.put(index, pieces[2]);
-                } else {
-                    System.out.println("Illegal constant or variable declaration @" + lineNo);
-                }
-            } else if(line.startsWith(":")) {
-                symbolTable.put(line, pc);
-            } else {
-                String[] parts = line.split("\\s+");
-                syntaxCheck(parts);
-                pc2line.put(pc, lineNo);
-                assemble(parts);
-            }
-            lineNo++;
-        }
-        for(int i = 0; i < variableCount; i++) {
-            program.add("0");
-        }
-        for(int i : stringLocationMap.keySet()) {
-            String s = stringLocationMap.get(i);
-            for(char c : s.toCharArray()) {
-                program.set(program.size() + i, "" + (int)c);
-                i++;
-            }
-            program.set(program.size() + i, "" + 0);
-        }
+        firstPass();  //the first pass.
+        secondPass();  //the second pass.
+        finish(); //closing the scanner.
+    }
+
+    private void finish() {
+        in.close();
+    }
+
+    private void secondPass() {
         for(int i = 0; i < program.size(); i++) {
             if(program.get(i).startsWith(":")) {
                 Integer address = symbolTable.get(program.get(i));
@@ -129,8 +83,49 @@ public class Assembler {
                 }
             }
         }
-        in.close();
-        return program;
+    }
+
+    private void placeStrings() {
+        for(int i : stringLocationMap.keySet()) {
+            String s = stringLocationMap.get(i);
+            for(char c : s.toCharArray()) {
+                program.set(program.size() + i, "" + (int)c);
+                i++;
+            }
+            program.set(program.size() + i, "" + 0);
+        }
+    }
+
+    private void firstPass() {
+        boolean declare = false;
+        while(in.hasNextLine()) {
+            String line = in.nextLine();
+            line = killComments(line).trim();
+            if(line.equals("")) continue;
+            if(line.equals(".declare")) {
+                declare = true;
+            } else if(line.equals(".begin")) {
+                declare = false;
+            } else if(declare) {
+                handleDeclare(line);
+            } else if(line.startsWith(":")) {
+                symbolTable.put(line, pc);
+            } else {
+                handleInstruction(line);
+            }
+            lineNo++;
+        }
+        for(int i = 0; i < variableCount; i++) {
+            program.add("0");
+        }
+        placeStrings();
+    }
+
+    private void handleInstruction(String line) {
+        String[] parts = line.split("\\s+");
+        syntaxCheck(parts);
+        pc2line.put(pc, lineNo);
+        assemble(parts);
     }
 
     private void syntaxCheck(String[] parts) {
@@ -171,5 +166,38 @@ public class Assembler {
             System.out.println("Invalid integer value @" + lineNo);
             return Integer.MIN_VALUE;
         }
+    }
+
+    public void handleDeclare(String line) {
+        String[] parts = line.split("\\s+");
+        if(parts.length == 1) {
+            symbolTable.put(line, --index);
+            variableCount++;
+        } else if(parts.length == 2) {
+            symbolTable.put(parts[0], parse(parts[1]));
+        } else if(parts.length == 3 && parts[1].equals("length")) {
+            try {
+                int length = Integer.parseInt(parts[2]);
+                variableCount += length;
+                index -= length;
+                symbolTable.put(parts[0], index);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Illegal array length constant @" + lineNo);
+            }
+        } else if(parts.length >= 3 && parts[1].equals("is")) {
+            String[] pieces = line.split("\\s+", 3);
+            pieces[2] = pieces[2].substring(1, pieces[2].length() - 1); //get rid of single quotes.
+            int length = pieces[2].length() + 1;
+            variableCount += length;
+            index -= length;
+            symbolTable.put(pieces[0], index);
+            stringLocationMap.put(index, pieces[2]);
+        } else {
+            System.out.println("Illegal constant or variable declaration @" + lineNo);
+        }
+    }
+
+    public ArrayList<String> program() {
+        return program;
     }
 }

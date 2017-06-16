@@ -26,7 +26,8 @@ public class AllInOne {
         try {
             Scanner scan = new Scanner(new File(args[0]));
             Assembler assembler = new Assembler(scan);
-            ArrayList<String> program = assembler.assemble();
+            assembler.assemble();
+            ArrayList<String> program = assembler.program();
             StackMachine machine = new StackMachine(memoryCapacity);
             for(String s : program) {
                 try {
