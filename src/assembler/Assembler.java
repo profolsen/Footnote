@@ -13,7 +13,7 @@ public class Assembler {
     private int lineNo = 1;
     private HashMap<String, Integer> symbolTable = new HashMap<String, Integer>();
     private ArrayList<String> program = new ArrayList<String>();
-    private ArrayList<Integer> pc = new ArrayList<Integer>();     //this should really be an integer, but that seems to cause errors.
+    private int pc;
     private HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
     private TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
     private Scanner in;
@@ -54,7 +54,7 @@ public class Assembler {
 
     public ArrayList<String> assemble() {
         //ArrayList<Integer> pc = new ArrayList<Integer>();
-        pc.add(0);
+        pc = 0;
         boolean declare = false;
         while(in.hasNextLine()) {
             String line = in.nextLine();
@@ -92,12 +92,12 @@ public class Assembler {
                     System.out.println("Illegal constant or variable declaration @" + lineNo);
                 }
             } else if(line.startsWith(":")) {
-                symbolTable.put(line, pc.get(0));
+                symbolTable.put(line, pc);
             } else {
                 String[] parts = line.split("\\s+");
                 syntaxCheck(parts);
-                pc2line.put(pc.get(0), lineNo);
-                assemble(parts, symbolTable, program, pc);
+                pc2line.put(pc, lineNo);
+                assemble(parts);
             }
             lineNo++;
         }
@@ -142,12 +142,12 @@ public class Assembler {
         }
     }
 
-    private void assemble(String[] parts, HashMap<String, Integer> symbolTable, ArrayList<String> program, ArrayList<Integer> pc) {
+    private void assemble(String[] parts) {
         try {
             Instruction instruction = Instruction.valueOf(parts[0]);
-            String[] assembled = instruction.assemble(parts, symbolTable, pc.get(0), System.out, lineNo);
+            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo);
             //System.out.println(Arrays.toString(assembled));
-            pc.set(0, pc.get(0) + assembled.length);
+            pc += assembled.length;
             for (String i : assembled) {
                 program.add(i);
             }
