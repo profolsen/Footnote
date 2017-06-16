@@ -29,7 +29,7 @@ public class Assembler {
         }
         PrintStream out = null;
         try {
-            out = new PrintStream("stringtest.txt");
+            out = new PrintStream(args[1]);
         } catch (FileNotFoundException e) {
             System.out.println("Could not open " + args[1]);
         }
@@ -131,28 +131,11 @@ public class Assembler {
     }
 
     private static void syntaxCheck(String[] parts) {
-        if(parts[0].equals("jmp") || parts[0].equals("jal") || parts[0].equals("lda") || parts[0].equals("sda")) {
-            checkThat(parts, true, true, false);
-        } else if(parts[0].equals("beq")) {
-            checkThat(parts, true, true, false);
-        } else if(parts[0].equals("ld")) {
-            checkThat(parts, true, true, true);
-        } else if(parts[0].equals("print") || parts[0].equals("println") || parts[0].equals("printch") || parts[0].equals("read")) {
-            checkThat(parts, false, false, false);
-        } else if(parts[0].equals("add") || parts[0].equals("sub") || parts[0].equals("mul") || parts[0].equals("div")) {
-            checkThat(parts, false, false, false);
-        } else if(parts[0].equals("zero") || parts[0].equals("one")) {
-            checkThat(parts, false, false, false);
-        } else if(parts[0].equals("dup") || parts[0].equals("cmp")) {
-            checkThat(parts, false, false, false);
-        } else if(parts[0].equals("ldi") || parts[0].equals("down")) {
-            checkThat(parts, true, true, true);
-        } else if(parts[0].equals("st")) {
-            checkThat(parts, true, true, true);
-        } else if(parts[0].equals("hlt") || parts[0].equals("ret")) {
-            checkThat(parts, false, false, false);
-        } else {
-            System.out.println("Undefined Instruction @" + lineNo);
+        try {
+            InstructionSyntax is = InstructionSyntax.valueOf(parts[0]);
+            is.checkSyntax(parts, System.out, lineNo);
+        } catch(IllegalArgumentException iae) {
+            System.out.println("Undefined Instruction " + parts[0] + " @" + lineNo);
         }
     }
 
