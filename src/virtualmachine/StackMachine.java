@@ -202,19 +202,19 @@ public class StackMachine {
                 pc++;
                 return;
             case 0x4:
-                add();
+                iarith();
                 pc++;
                 return;
             case 0x5:
-                sub();
+                farith();
                 pc++;
                 return;
             case 0x6:
-                mul();
+                //this instruction is undefined.
                 pc++;
                 return;
             case 0x7:
-                div();
+                //this instruction is undefined.
                 pc++;
                 return;
             case 0x8:
@@ -239,7 +239,7 @@ public class StackMachine {
             case 0xC:
                 //retired dupn() becuase it isn't really useful.
                 //dupn();
-                cmp();
+                //this instruction is undefined.
                 pc++;
                 return;
             case 0xD:
@@ -256,11 +256,31 @@ public class StackMachine {
         }
     }
 
-    private void swap() {  //swap the order of the top two things on the stack.
-        int x = pop();
-        int y = pop();
-        push(x);
-        push(y);
+    private void farith() {
+        int code = memory.get(++pc);
+        //do nothing since at the moment no floating point operations are defined.
+        //we just need to get the code, because the specification requires a code argument.
+    }
+
+    private void iarith() {
+        int code = memory.get(++pc);
+        switch(code) {
+            case 0x1:
+                push(pop() + pop());
+                break;
+            case 0x2:
+                push(pop() - pop());
+                break;
+            case 0x3:
+                push(pop() * pop());
+                break;
+            case 0x4:
+                push(pop() / pop());
+                break;
+            case 0x5:
+                push(Integer.compare(pop(), pop()));
+                break;
+        }
     }
 
     public void run() {

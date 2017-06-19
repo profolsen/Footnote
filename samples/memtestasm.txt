@@ -3,7 +3,7 @@
 
 .declare
 :i               ; a loop counter.
-:limit 235
+:limit 234
 
 .begin
 

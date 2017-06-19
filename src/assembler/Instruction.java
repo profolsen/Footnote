@@ -53,7 +53,7 @@ public enum Instruction {
     lda(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[7];
+            String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
             ans[0] = "" + 0xD;   //load the base address onto stack.
@@ -62,11 +62,13 @@ public enum Instruction {
             pc++;
             ans[2] = "" + 0x4;   //add the base address to whatever was already on the stack...
             pc++;
-            ans[3] = "" + 0xE;   //store the calculated address as a target to load.
+            ans[3] = "" + 0x1;
+            pc++;
+            ans[4] = "" + 0xE;   //store the calculated address as a target to load.
             pc += 3;
-            ans[4] = "" + pc; //where we are storing the value.
-            ans[5] = "" + 0x2;    //the load instruction.
-            ans[6] = "" + 0x0;  //this value should be overriden by the store instruction above.
+            ans[5] = "" + pc; //where we are storing the value.
+            ans[6] = "" + 0x2;    //the load instruction.
+            ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -75,7 +77,7 @@ public enum Instruction {
     sda(true, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[7];
+            String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
             ans[0] = "" + 0xD;   //load the base address onto stack.
@@ -84,11 +86,13 @@ public enum Instruction {
             pc++;
             ans[2] = "" + 0x4;   //add the base address to whatever was already on the stack...
             pc++;
-            ans[3] = "" + 0xE;   //store the calculated address as a target to load.
+            ans[3] = "" + 0x1;
+            pc++;
+            ans[4] = "" + 0xE;   //store the calculated address as a target to load.
             pc += 3;
-            ans[4] = "" + pc; //where we are storing the value.
-            ans[5] = "" + 0xE;    //the store instruction.
-            ans[6] = "" + 0x0;  //this value should be overriden by the store instruction above.
+            ans[5] = "" + pc; //where we are storing the value.
+            ans[6] = "" + 0xE;    //the store instruction.
+            ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -192,8 +196,10 @@ public enum Instruction {
     add(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
+            String[] ans = new String[2];
             ans[0] = "" + 0x4;
+            pc++;
+            ans[1] = "" + 0x1;
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -202,8 +208,10 @@ public enum Instruction {
     sub(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x5;
+            String[] ans = new String[2];
+            ans[0] = "" + 0x4;
+            pc++;
+            ans[1] = "" + 0x2;
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -212,8 +220,10 @@ public enum Instruction {
     mul(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x6;
+            String[] ans = new String[2];
+            ans[0] = "" + 0x4;
+            pc++;
+            ans[1] = "" + 0x3;
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -222,8 +232,10 @@ public enum Instruction {
     div(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x7;
+            String[] ans = new String[2];
+            ans[0] = "" + 0x4;
+            pc++;
+            ans[1] = "" + 0x4;
             pc++;
             //ans[0] = "" + pc;
             return ans;
@@ -262,8 +274,10 @@ public enum Instruction {
     cmp(false, false) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0xC;
+            String[] ans = new String[2];
+            ans[0] = "" + 0x4;
+            pc++;
+            ans[1] = "" + 0x5;
             pc++;
             //ans[0] = "" + pc;
             return ans;

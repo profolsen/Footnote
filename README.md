@@ -56,12 +56,14 @@ For example, if the stack effect is pictured as (x y... -> y x...), then this me
 Finally, there is a short description of what the instruction does.
 * dup (0xA) | (x... -> x x...) this instruction pushes a duplicate of the value on top of the stack.
 * down val (0xB) | [val = 1: (x y... -> y x...), val = 2: (x y z... -> y z x...)] this instruction moves the top element on the stack val levels deep into the stack.
-* cmp (0xC) | (x y... -> r...) this instruction pops the top value of the stack and duplicates that number of values.
-In the picture of the effects of this instruction on the stack, r is -1 if x < y, 0 if x = y, and 1 if x > y.
-* add (0x4) | (x y... -> x+y...) this instruction replaces the top value on the stack with the sum of the top two values on the stack.
-* sub (0x5) | (x y... -> x-y...) this instruction replaces the top value on the stack with the top value minus the next value.
-* mul (0x6) | (x y... -> x*y...) this instruction replaces the top value on the stack with the top two values multiplied together.
-* div (0x7) | (x y... -> x/y...)) this instruction replaces the top value on the stack with the top value divided by the next value.
+* iarith code (0x4) | (x y... -> f(x, y)...) this instruction applies a mathematical function to the top two stack elements.
+The function this instruction executes depends on the argument code which must be supplied.
+See <b>Integer Arithmetic Extended Instructions</b> below for details.
+* undefined (0xC) | (no stack effects) This instruction does nothing.   
+* farith code (0x5) | (x y... -> f(x, y)...) This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack.
+Currently, no floating point operations are defined.
+* undefined (0x6) | (no stack effects) This instruction does nothing. 
+* undefined (0x7) | (no stack effects) This instruction does nothing. 
 * jmp (0x0) | (x... -> ...) this instruction pops the top value off the stack and goes to that position.
 * beq (0x1) | (x y z... -> ...) this instruction branches pops the top three values off the stack.
 If the second two popped values are equal, it branches to the first popped value.
@@ -80,20 +82,19 @@ Like ld, this instruction operates in two modes, see ld for details.
 * hlt (0x15) |  this instruction signals the end of a program.
 * ldi val (0xD) | (... -> val...) this instruction pushes the next value onto the stack.
 
-<!---The following removed because isn't that part of the fun of programming?
-     (To figure out how to do tricky but potentially useful things?--->
-<!---<b>Wait... No Pop?</b>
-It is true that there is no pop instruction.  With good memory management, being able to pop a value of the stack is unnecessary.  However, if popping is something you just can't do without, the following sequence of instructions will pop a value off the stack: 
-0. -> x y...
-1. dup -> x x y...
-2. zero -> 0 x x y...
-3. sub -> -x x y...
-4. add -> 0 y...
-5. add -> y...
-<!---
-The disclaimer here is of course that this only works if there's more than one value on the stack.
-This problem can be easily avoided by just pushing a zero on the stack at the beginning of program execution.
---->
+<b>Integer Arithmetic Extended Instructions</b>
+An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
+It then executes a mathematical operation on them (e.g., add) and pushes the result to the stack.
+When describing various integer arithmetic calls, the following format is used:
+* code (name) - description
+* 0x1 (add) - adds the top two values on the stack together.
+* 0x2 (sub) - subtracts the second to top value on the stack from the top value on the stack.
+* 0x3 (mul) - multiplies the top two values on the stack together.
+* 0x4 (div) - divides the top value on the stack by the second to top value on the stack.
+* 0x5 (cmp) - this instruction compares the top two values on the stack.
+If the two values are equal, a zero is pushed.
+If the top value is greater, a one is pushed.
+If the top value is less than the second to top value, a negative 1 is pushed.
 
 <b>System Calls.</b>
 When describing various system calls, the following format is used:
