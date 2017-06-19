@@ -137,152 +137,19 @@ public enum Instruction {
             return ans;
         }
     },
-    print(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = ("" + 0x3);
-            pc++;
-            ans[1] = ("" + 0x1);
-            //ans[0] = "" + pc;
-            return ans;
-
-        }
-    },
-    println(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = ("" + 0x3);
-            pc++;
-            ans[1] = ("" + 0x3);
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    printch(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = ("" + 0x3);
-            pc++;
-            ans[1] = ("" + 0x2);
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    read(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = ("" + 0x3);
-            pc++;
-            ans[1] = ("" + 0x4);
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    diagnostics(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = ("" + 0x3);
-            pc++;
-            ans[1] = ("" + 0x0);
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    add(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = "" + 0x4;
-            pc++;
-            ans[1] = "" + 0x1;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    sub(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = "" + 0x4;
-            pc++;
-            ans[1] = "" + 0x2;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    mul(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = "" + 0x4;
-            pc++;
-            ans[1] = "" + 0x3;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    div(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = "" + 0x4;
-            pc++;
-            ans[1] = "" + 0x4;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    zero(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x8;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    one(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x9;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    dup(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0xA;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    cmp(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[2];
-            ans[0] = "" + 0x4;
-            pc++;
-            ans[1] = "" + 0x5;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
+    print(new int[] {0x3, 0x1}),
+    println(new int[] {0x3, 0x3}),
+    printch(new int[] {0x3, 0x2}),
+    read(new int[] {0x3, 0x4}),
+    diagnostics(new int[] {0x3, 0x0}),
+    add(new int[] {0x4, 0x1}),
+    sub(new int[] {0x4, 0x2}),
+    mul(new int[] {0x4, 0x3}),
+    div(new int[] {0x4, 0x4}),
+    zero(new int[] {0x8}),
+    one(new int[] {0x9}),
+    dup(new int[] {0xA}),
+    cmp(new int[] {0x4, 0x5}),
     ldi(true, true) {
         @Override
         public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
@@ -338,35 +205,26 @@ public enum Instruction {
             return ans;
         }
     },
-    ret(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0x0;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    },
-    hlt(false, false) {
-        @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
-            String[] ans = new String[1];
-            ans[0] = "" + 0xF;
-            pc++;
-            //ans[0] = "" + pc;
-            return ans;
-        }
-    };
+    ret(new int[] {0x0}),
+    hlt(new int[] {0xF});
 
 
 
     private boolean takesLabel;  //true if takes a label (some string starting with ':').
     private boolean takesValue;  //true if takes a value (a decimal integer).
+    private int[] code = null; //the code this instruction will assemble into.
+            //this field is only used by instructions that are relatively straightforward
+            //when they assemble (e.g., add).
 
     Instruction(boolean takesLabel, boolean takesValue) {
         this.takesValue = takesValue;
         this.takesLabel = takesLabel;
+    }
+
+    Instruction(int[] code) {  //simple no argument instructions.
+        this.code = code;
+        takesLabel = false;
+        takesValue = false;
     }
 
     @Override
@@ -436,7 +294,15 @@ public enum Instruction {
      * symbols that cannot be resolved are put in the appropriate place in the assembled instruction
      * as symbols.
      */
-    public abstract String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno);
+    public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        if(code != null) {
+            String[] ans = new String[code.length];
+            for(int i = 0; i < ans.length; i++) {
+                ans[i] = "" + code[i];
+            }
+            return ans;
+        } else return new String[] {};  //no information so assemble into empty array (not null!).
+    }
 
     /**
      * This method is to get rid of unused field warnings for the members of this enum.
