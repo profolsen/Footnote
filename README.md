@@ -221,15 +221,15 @@ The next instruction to be executed is the instruction that is immediately after
 * printch<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a ASCII character.
 * println<sup>x</sup> - prints a newline to the screen.
 * read<sup>x</sup> - reads a character of input from the user and pushes it on the stack.
-* add - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
-* sub - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
-* mul - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
-* div - divides the top value by the next value on the stack; pops both values off the stack; pushes the result on the stack.
+* add<sup>x</sup> - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
+* sub<sup>x</sup> - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
+* mul<sup>x</sup> - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
+* div<sup>x</sup> - divides the top value by the next value on the stack; pops both values off the stack; pushes the result on the stack.
 * zero - pushes the value 0 onto the stack.
 * one - pushes the value 1 onto the stack.
 * dup - pushes a copy of the value on top of the stack onto the stack.
 * down number - moves the element on top of the stack down the specified number of elements into the stack.
-* cmp - compares the top two values on the stack, pops them both off the stack and pushes the result of the comparison.
+* cmp<sup>x</sup> - compares the top two values on the stack, pops them both off the stack and pushes the result of the comparison.
 The comparison has three possible results.
 The result is -1 if the top value is less than the value underneath it.
 The result is 0 if both top values are equal.
