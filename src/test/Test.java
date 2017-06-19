@@ -1,6 +1,7 @@
 package test;
 
 import assembler.AllInOne;
+import emulator.Emulator;
 
 /**
  * Created by po917265 on 6/5/17.
@@ -13,5 +14,6 @@ public class Test {
         AllInOne.Main(new String[]{"samples/stringtestasm.txt", "256"});
         AllInOne.Main(new String[]{"samples/errtestasm.txt", "256"});
         AllInOne.Main(new String[]{"samples/memtestbadasm.txt", "256"});
+        Emulator.main(new String[]{"samples/fibonacci.txt", "256"});
     }
 }

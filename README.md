@@ -119,22 +119,22 @@ Comments are not allowed in programs written for this FootnoteVM, but are provid
 8 //pushes 0 on to the stack
 9 //pushes 1 on to the stack
 10 //beginning of the loop; duplicate the value on the top of the stack, initially a 1.
-14 28 //pop and store the top stack element.
-4 //add the top two values on the stack to get the next fibonacci number; store the number on the stack.
+14 29 //pop and store the top stack element.
+4 1//add the top two values on the stack to get the next fibonacci number; store the number on the stack.
 10 //duplicate the new fibonacci number.
 3 1 3 3 //print out the fibonacci number and a new line (two separate instructions).
-14 29 //pop and store the new fibonacci number at address 29 (see below).
-2 28 //push the value stored at address 28.  Note that we could also have used -1 as the address to get the same result
-2 29 //push the value stored at address 29.
-2 28 //push the value stored at 28.
+14 30 //pop and store the new fibonacci number at address 30 (see below).
+2 29 //push the value stored at address 29.  Note that we could also have used -1 as the address to get the same result
+2 30 //push the value stored at address 30.
+2 29 //push the value stored at 29.
 13 144 //push the constant 144 (decimal) on to the stack.
-13 27 //push the address 27 (target of a beq) on to the stack.
+13 28 //push the address 28 (target of a beq) on to the stack.
 1 //beq, compare the smaller currently stored fib number with 144 on equality, branch to 27.
 13 2 //load the address 2 (top of the loop) on to the stack.
 0 //branch unconditionally to address 2 pop 2 off the stack.
 15 //address 27.  A halt instruction.  The Executable Section ends here.
-0 //variable, address 28. By putting a zero here, this address is reserved and will not be overriden by a push.
-0 //variable, address 29.
+0 //variable, address 29. By putting a zero here, this address is reserved and will not be overriden by a push.
+0 //variable, address 30.
 //the remaining memory addresses will be potentially used by the stack</pre>.
 
 Footnote Assembler
