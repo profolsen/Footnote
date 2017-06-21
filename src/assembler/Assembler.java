@@ -19,9 +19,17 @@ public class Assembler {
     private Scanner in;
     private int variableCount = 0;
     private int index = 0;
+    private ArrayList<String> includedFiles = new ArrayList<String>();
+    private Assembler root = null; //if null, then this is a top level assembler.
 
     public Assembler(Scanner source) {
         in = source;
+        root = this;
+    }
+
+    public Assembler(Scanner source, Assembler root) {
+        this(source);
+        this.root = root;
     }
 
     public static void main(String[] args) {
@@ -43,6 +51,7 @@ public class Assembler {
             System.out.println("Could not open " + args[1]);
         }
         Assembler assembler = new Assembler(scan);
+        assembler.includedFiles.add(args[0].trim());
         assembler.assemble();
         ArrayList<String> program = assembler.program();
         //System.out.println(program);
@@ -51,6 +60,11 @@ public class Assembler {
         }
         scan.close();
         out.close();
+    }
+
+    public void assembleFirstPassOnly() {
+        firstPass();
+        finish();
     }
 
     //a two pass assembler.
@@ -66,7 +80,14 @@ public class Assembler {
     }
 
     private void secondPass() {
+        for(int i = 0; i < variableCount; i++) {
+            program.add("0");
+        }
+        placeStrings();
         for(int i = 0; i < program.size(); i++) {
+            if(program.get(i).equals(".begin")) {
+                program.set(i, "" + symbolTable.get(program.get(i)));
+            }
             if(program.get(i).startsWith(":")) {
                 Integer address = symbolTable.get(program.get(i));
                 if(address == null) {
@@ -98,16 +119,38 @@ public class Assembler {
 
     private void firstPass() {
         boolean declare = false;
+        boolean include = false;
+        boolean including = false;
+        boolean beginbegan = false;
+
+        //the following: always skip to the beginning of the program.
+        //because includes are always at the top.
+        //but these lines only need to be done IF this is the top level program (i.e., if root == this).
+        if(root == this) {
+            program.add("" + 0xD);
+            program.add(".begin");
+            program.add("" + 0x0);
+            pc += 3;
+        }
+
         while(in.hasNextLine()) {
             String line = in.nextLine();
             line = killComments(line).trim();
             if(line.equals("")) continue;
             if(line.equals(".declare")) {
                 declare = true;
+                include = false;
+            } else if(line.equals(".include")) {
+                include = true;
+                declare = false;
             } else if(line.equals(".begin")) {
+                if(root == this) symbolTable.put(".begin", pc);
+                include = false;
                 declare = false;
             } else if(declare) {
                 handleDeclare(line);
+            } else if(include) {
+                handleInclude(line);
             } else if(line.startsWith(":")) {
                 symbolTable.put(line, pc);
             } else {
@@ -115,10 +158,37 @@ public class Assembler {
             }
             lineNo++;
         }
-        for(int i = 0; i < variableCount; i++) {
-            program.add("0");
-        }
-        placeStrings();
+    }
+
+    private void handleInclude(String line) {
+        String filename = line + ".ftnt";
+        if(! root.includedFiles.contains(filename)) {
+            root.includedFiles.add(filename);
+            try {
+                Assembler assm = new Assembler(new Scanner(new File(filename)), root);
+                assm.assembleFirstPassOnly();
+                System.out.println(assm.program);
+                ArrayList<String> result = assm.program();
+                //we don't want to include the variable stuff... but we __do__ want to include the
+                //strings and arrays.
+                for(String origKey : assm.symbolTable.keySet()) {
+                    String key = origKey.substring(1); //get rid of colon.
+                    key = ":" + line + "." + key;
+                    symbolTable.put(key, assm.symbolTable.get(origKey));
+                }
+                for(int i = 0; i < assm.program.size(); i++) {
+                    if(assm.program.get(i).startsWith(":")) {
+                        assm.program.set(i, ":" + line + "." + assm.program.get(i).substring(1));
+                    } else if(assm.program.get(i).startsWith("!")) {
+                        assm.program.set(i, "!:" + line + "." + assm.program.get(i).substring(2));
+                    }
+                }
+                program.addAll(result);
+                pc += result.size();
+            } catch (FileNotFoundException e) {
+                System.out.println("Could not find: " + filename);
+            }
+        } //including a file twice is not an error and has no effect.
     }
 
     private void handleInstruction(String line) {
@@ -171,12 +241,24 @@ public class Assembler {
     public void handleDeclare(String line) {
         String[] parts = line.split("\\s+");
         if(parts.length == 1) {
+            if(parts[0].contains(".")) {
+                System.out.println("Illegal variable name: " + parts[0] + " @ " + lineNo);
+                return;
+            }
             symbolTable.put(line, --index);
             variableCount++;
         } else if(parts.length == 2) {
+            if(parts[0].contains(".")) {
+                System.out.println("Illegal constant name: " + parts[0] + " @ " + lineNo);
+                return;
+            }
             symbolTable.put(parts[0], parse(parts[1]));
         } else if(parts.length == 3 && parts[1].equals("length")) {
             try {
+                if(parts[0].contains(".")) {
+                    System.out.println("Illegal array name: " + parts[0] + " @ " + lineNo);
+                    return;
+                }
                 int length = Integer.parseInt(parts[2]);
                 variableCount += length;
                 index -= length;
@@ -185,6 +267,10 @@ public class Assembler {
                 System.out.println("Illegal array length constant @" + lineNo);
             }
         } else if(parts.length >= 3 && parts[1].equals("is")) {
+            if(parts[0].contains(".")) {
+                System.out.println("Illegal string name: " + parts[0] + " @ " + lineNo);
+                return;
+            }
             String[] pieces = line.split("\\s+", 3);
             pieces[2] = pieces[2].substring(1, pieces[2].length() - 1); //get rid of single quotes.
             int length = pieces[2].length() + 1;

@@ -141,17 +141,42 @@ Footnote Assembler
 -------------------
 
 An assembler is included to facilitate the writing of programs for the Footnote VM.
-Programs written in the assembly language provided here are defined in two sections.
-1. The .declare section is used to define constants and variables.
-2. The .begin section is used to store the code to be executed.
+Programs written in the assembly language provided here are defined in three sections.
+1. The .include section is used to include code from other files in the program.
+2. The .declare section is used to define constants and variables.
+3. The .begin section is used to store the code to be executed.
 
-Each of these sections begins with ".declare" or ".begin" on a line by itself.
+Each of these sections begins with ".declare", ".begin" or ".include" on a line by itself.
+
+<b>The .include Section.</b>
+The .include section contains a list of files to include.  
+Files may be in the same directory, only the file name (.ftnt extension is assumed) is needed or files may be in a different directory, in which case the path and file name (.ftnt extension is assumed) are needed.
+All labels and constants from the included files are usable in the .begin section of the program.
+Variable, array, and string declarations are not usable, so names of variables, strings and arrays can be reused.
+An example of an include line could be:
+<pre>
+; includeexample.ftnt
+.include
+; ...
+modulus ;contains some code with the starting address labeled 'mod'.
+; ...
+.begin
+; ...
+jal mod  ; using the included code.
+; ...
+</pre>
+In this example, modulus.ftnt (contained in the same directory as includeexample.ftnt) contains a block of code with the label 'mod'.  
+When the program in includeexample.ftnt executes the 'jal mod' instruction, it jumps to the code included from modulus.ftnt with the 'mod' label and picks up execution there.
+
+Included files may themselves contain included files.  
+files included multiple times or including themselves (directly or indirectly) have no effect on the assembly of a program.
+
 
 <b>The .declare Section.</b>
 There are four kinds of declarations that may occur in the .declare section.
 The first, a variable declaration, signals to the assembler to reserve space to be used as the variable.
 Variable declarations always begin with a colon (:) and are followed by a variable name.
-Variable names can include any characters except whitespace in any order.
+Variable names can include any characters except whitespace and '.' in any order.
 An example of a variable declaration is:
 <pre>:var</pre>
 In this example, a variable named :var is created.  
@@ -205,7 +230,7 @@ In this example, the label :infiniteloop is the location of the first executable
 In this case, that means the label :infiniteloop refers to the jmp instruction.
 Therefore, this program is an infinite loop: the jmp instruction branches to itself.
 
-A label is a line starting with a colon (:) and a name of the label, which can be any combination of non-whitespace characters.
+A label is a line starting with a colon (:) and a name of the label, which can be any combination of characters as long as no whitespace or '.' character is present.
 When using a label as an argument to an instruction, the colon must be included.
 
 The following list describes each instruction, its arguments (if any) and what it does.

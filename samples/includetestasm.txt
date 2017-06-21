@@ -1,0 +1,14 @@
+.include
+samples/modulus
+
+.declare
+:x 73
+:y 23
+
+.begin
+ldi :y
+ldi :x           ; push the values on the stack.
+jal :mod         ; do the mod, should result in the modulus of the two numbers on top of the stack.
+print            ; print the result.
+println          ; format things nicely!
+hlt              ; end of program.

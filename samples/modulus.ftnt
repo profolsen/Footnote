@@ -1,0 +1,21 @@
+.declare
+:modulus
+:dividend
+:string is 'chickens'
+
+.begin
+:mod             ; takes two numbers, pops the two numbers off the stack and pushes their modulus on the stack.
+down 2           ; put the return address underneath the arguments on the stack.
+dup
+st :dividend     ; we'll need this for later.
+down 1           ; we need to store the second item on the stack (the modulus).
+dup
+st :modulus
+down 1           ; swap back so that we can divide...
+div              ; at this point the quotient is on top of the stack.
+ld :modulus
+mul              ; get what quotient * modulus would be.
+ld :dividend     ; now get ready to do the math for the remainder.
+sub              ; remainder should now be on top of the stack.
+down 1           ; we need to put return address on top.
+ret              ; return back.

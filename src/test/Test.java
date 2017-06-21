@@ -13,7 +13,8 @@ public class Test {
         AllInOne.Main(new String[]{"samples/memtestasm.txt", "256"});
         AllInOne.Main(new String[]{"samples/stringtestasm.txt", "256"});
         AllInOne.Main(new String[]{"samples/errtestasm.txt", "256"});
-        AllInOne.Main(new String[]{"samples/memtestbadasm.txt", "256"});
+        AllInOne.Main(new String[]{"samples/includetestasm.txt", "256"});
         Emulator.main(new String[]{"samples/fibonacci.txt", "256"});
+        AllInOne.Main(new String[]{"samples/memtestbadasm.txt", "256"});
     }
 }
