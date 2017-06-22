@@ -66,14 +66,15 @@ public class Assembler {
     }
 
     public void assembleFirstPassOnly() {
-        firstPass();
+        firstPass(false);
+        System.out.println(stringLocationMap);
         finish();
     }
 
     //a two pass assembler.
     public void assemble() {
         //ArrayList<Integer> pc = new ArrayList<Integer>();
-        firstPass();  //the first pass.
+        firstPass(true);  //the first pass.
         secondPass();  //the second pass.
         finish(); //closing the scanner.
     }
@@ -120,7 +121,7 @@ public class Assembler {
         }
     }
 
-    private void firstPass() {
+    private void firstPass(boolean assembleBranchLabels) {
         boolean declare = false;
         boolean include = false;
         boolean including = false;
@@ -158,9 +159,19 @@ public class Assembler {
                 symbolTable.put(line, pc);
                 branchLabels.add(line);
             } else {
-                handleInstruction(line);
+                handleInstruction(line, assembleBranchLabels);
             }
             lineNo++;
+        }
+        if(assembleBranchLabels) {
+            for(int i = 0; i < program.size(); i++) {  //some macros require relative targets for branching,
+                                                       // we need to make these absolute now.
+                String x = program.get(i);
+                if(x.startsWith("+")) {
+                    int target = i + Integer.parseInt(x.substring(1));
+                    program.set(i, "" + target);
+                }
+            }
         }
     }
 
@@ -176,16 +187,17 @@ public class Assembler {
                 //strings and arrays.
                 for(String origKey : assm.symbolTable.keySet()) {
                     String key = redirectKey(origKey, line);
-                    branchLabels.add(key);
+                    if(assm.branchLabels.contains(origKey)) branchLabels.add(key);
                     symbolTable.put(key, assm.symbolTable.get(origKey));
                 }
                 for(String s : branchLabels) {
                     symbolTable.put(s, symbolTable.get(s) + pc);
                 }
+                index += assm.index;
                 stringLocationMap.putAll(assm.stringLocationMap);
                 for(int i = 0; i < assm.program.size(); i++) {
                     if(assm.program.get(i).startsWith(":") || assm.program.get(i).startsWith("!")) {
-                        assm.program.set(i, redirectKey(assm.program.get(i).substring(1), line));
+                        assm.program.set(i, redirectKey(assm.program.get(i), line));
                     }
                 }
                 program.addAll(result);
@@ -213,11 +225,11 @@ public class Assembler {
         return key;
     }
 
-    private void handleInstruction(String line) {
+    private void handleInstruction(String line, boolean assembleBranchLabels) {
         String[] parts = line.split("\\s+");
         syntaxCheck(parts);
         pc2line.put(pc, lineNo);
-        assemble(parts);
+        assemble(parts, assembleBranchLabels);
     }
 
     private void syntaxCheck(String[] parts) {
@@ -229,11 +241,10 @@ public class Assembler {
         }
     }
 
-    private void assemble(String[] parts) {
+    private void assemble(String[] parts, boolean assembleBranchLabels) {
         try {
             Instruction instruction = Instruction.valueOf(parts[0]);
-            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo);
-            //System.out.println(Arrays.toString(assembled));
+            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo, assembleBranchLabels);
             pc += assembled.length;
             for (String i : assembled) {
                 program.add(i);

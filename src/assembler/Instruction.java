@@ -12,15 +12,16 @@ public enum Instruction {
     //instructions, and their syntax.
     jal(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[5];
             ans[0] = ("" + 0xD);
             //we need to do incrementing before the linking, so we link back to the correct location.
             pc+= 5;
-            ans[1] = ("" + pc); //should return to this location...
+            //ans[1] = ("" + pc); //should return to this location...
+            ans[1] = "+4";
             Integer address = symbolTable.get(parts[1]);
             ans[2] = ("" + 0xD);
-            if(address == null)
+            if(address == null || !assembleBranchLabels)
             {
                 ans[3] = (parts[1]);
             } else {
@@ -32,12 +33,12 @@ public enum Instruction {
     },
     jmp(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
             ans[0] = "" + 0xD;
             pc++;
-            if(address == null)
+            if(address == null || !assembleBranchLabels)
             {
                 ans[1] = parts[1];
             } else {
@@ -52,7 +53,7 @@ public enum Instruction {
     },
     lda(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
@@ -66,7 +67,8 @@ public enum Instruction {
             pc++;
             ans[4] = "" + 0xE;   //store the calculated address as a target to load.
             pc += 3;
-            ans[5] = "" + pc; //where we are storing the value.
+            //ans[5] = "" + pc; //where we are storing the value.
+            ans[5] = "+2";
             ans[6] = "" + 0x2;    //the load instruction.
             ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
@@ -76,7 +78,7 @@ public enum Instruction {
     },
     sda(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
@@ -89,8 +91,9 @@ public enum Instruction {
             ans[3] = "" + 0x1;
             pc++;
             ans[4] = "" + 0xE;   //store the calculated address as a target to load.
-            pc += 3;
-            ans[5] = "" + pc; //where we are storing the value.
+            //pc += 3;
+            //ans[5] = "" + pc; //where we are storing the value.
+            ans[5] = "+2";
             ans[6] = "" + 0xE;    //the store instruction.
             ans[7] = "" + 0x0;  //this value should be overriden by the store instruction above.
             pc++;
@@ -100,12 +103,12 @@ public enum Instruction {
     },
     beq(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
             ans[0] = "" + 0xD;
             pc++;
-            if(address == null)
+            if(address == null || !assembleBranchLabels)
             {
                 ans[1] = parts[1];
             } else {
@@ -120,7 +123,7 @@ public enum Instruction {
     },
     ld(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[2];
             ans[0] = ("" + 0x2);
             pc++;
@@ -152,7 +155,7 @@ public enum Instruction {
     cmp(new int[] {0x4, 0x5}),
     ldi(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xD);
             pc++;
@@ -172,7 +175,7 @@ public enum Instruction {
     },
     down(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xB);
             pc++;
@@ -191,7 +194,7 @@ public enum Instruction {
     },
     st(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xE);
             pc++;
@@ -289,12 +292,13 @@ public enum Instruction {
      * @param pc the program counter index of current instruction in assembled code.
      * @param error where to print a syntax error if it should occur.
      * @param lineno the line number the instruction being assembled came from.
+     * @param assembleBranchLabels
      * @return the assembled instruction and updated pc.
      * position 0 is the updated pc, the rest is the assembled instruction.
      * symbols that cannot be resolved are put in the appropriate place in the assembled instruction
      * as symbols.
      */
-    public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+    public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, boolean assembleBranchLabels) {
         if(code != null) {
             String[] ans = new String[code.length];
             for(int i = 0; i < ans.length; i++) {

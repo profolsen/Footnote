@@ -1,0 +1,16 @@
+.declare
+:chicken 816
+:string is 'goat'
+
+.begin
+:test1
+ldi 814
+print
+println
+ret
+
+:test3
+ldi 815
+print
+println
+ret

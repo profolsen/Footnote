@@ -1,0 +1,20 @@
+.include
+samples/include_2
+
+.begin
+jal :include_2.test1               ; should print 813.
+jal :include_2.test2               ; should print 814.
+jal :include_2.include_3.test3     ; should print 815.
+
+one
+lda :include_2.string
+printch                            ; should print h
+println
+one
+lda :include_2.include_3.string    ; should print o
+printch
+println
+ldi :include_2.include_3.chicken   ; should print 816.
+print
+println
+hlt

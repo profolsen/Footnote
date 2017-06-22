@@ -1,0 +1,17 @@
+.include
+samples/include_3
+
+.declare
+:string is 'chicken'
+
+.begin
+
+:test1
+ldi 813
+print
+println
+ret
+
+:test2
+jal :include_3.test1
+ret
