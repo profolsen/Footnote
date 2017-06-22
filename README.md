@@ -169,10 +169,9 @@ jal :modulus.mod  ; using the included code.
                   ; notice that it is unnecessary to include the path.
 ; ...
 </pre>
-In this example, modulus.ftnt (contained in the same directory as includeexample.ftnt) contains a block of code with the label 'mod'.  
-When the program in includeexample.ftnt executes the 'jal mod' instruction, it jumps to the code included from modulus.ftnt with the 'mod' label and picks up execution there.
-
-Included files may themselves contain included files.  
+In this example, modulus.ftnt (contained in the same directory as includeexample.ftnt) contains a block of code with the label 'mod'.
+When the program when our program executes the 'jal :modulus.mod' instruction, it jumps to the code included from modulus.ftnt with the 'mod' label and picks up execution there.
+Included files may themselves contain included files.
 files included multiple times or including themselves (directly or indirectly) have no effect on the assembly of a program.
 
 
@@ -211,7 +210,7 @@ An example of a string declaration is:
 :string is 'I am happy.'
 </pre>
 In this example, :string is the address of the first character in the string 'I am happy.'
-a null character (ASCII code 0) is always appended on the end of strings created in this way.
+A null character (ASCII code 0) is always appended on the end of strings created in this way.
 Please note that there are no escape sequences for strings available.
 
 
