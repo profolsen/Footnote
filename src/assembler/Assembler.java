@@ -21,6 +21,9 @@ public class Assembler {
     private int index = 0;
     private ArrayList<String> includedFiles = new ArrayList<String>();
     private Assembler root = null; //if null, then this is a top level assembler.
+    private HashSet<String> branchLabels = new HashSet<String>(); //need to keep track of branch labels
+                //for includes, because branch labels are always incorrect when loaded.  They need to be fixed.
+                //by an offset.
 
     public Assembler(Scanner source) {
         in = source;
@@ -153,6 +156,7 @@ public class Assembler {
                 handleInclude(line);
             } else if(line.startsWith(":")) {
                 symbolTable.put(line, pc);
+                branchLabels.add(line);
             } else {
                 handleInstruction(line);
             }
@@ -167,28 +171,46 @@ public class Assembler {
             try {
                 Assembler assm = new Assembler(new Scanner(new File(filename)), root);
                 assm.assembleFirstPassOnly();
-                System.out.println(assm.program);
                 ArrayList<String> result = assm.program();
                 //we don't want to include the variable stuff... but we __do__ want to include the
                 //strings and arrays.
                 for(String origKey : assm.symbolTable.keySet()) {
-                    String key = origKey.substring(1); //get rid of colon.
-                    key = ":" + line + "." + key;
+                    String key = redirectKey(origKey, line);
+                    branchLabels.add(key);
                     symbolTable.put(key, assm.symbolTable.get(origKey));
                 }
+                for(String s : branchLabels) {
+                    symbolTable.put(s, symbolTable.get(s) + pc);
+                }
+                stringLocationMap.putAll(assm.stringLocationMap);
                 for(int i = 0; i < assm.program.size(); i++) {
-                    if(assm.program.get(i).startsWith(":")) {
-                        assm.program.set(i, ":" + line + "." + assm.program.get(i).substring(1));
-                    } else if(assm.program.get(i).startsWith("!")) {
-                        assm.program.set(i, "!:" + line + "." + assm.program.get(i).substring(2));
+                    if(assm.program.get(i).startsWith(":") || assm.program.get(i).startsWith("!")) {
+                        assm.program.set(i, redirectKey(assm.program.get(i).substring(1), line));
                     }
                 }
                 program.addAll(result);
                 pc += result.size();
+                variableCount += assm.variableCount;
             } catch (FileNotFoundException e) {
                 System.out.println("Could not find: " + filename);
             }
         } //including a file twice is not an error and has no effect.
+    }
+
+    private String redirectKey(String key, String name) {
+        boolean exclaim = false;
+        if(name.contains("/")) {   //get rid of paths in name.
+            name = name.substring(name.lastIndexOf('/') + 1);
+        }
+        if(key.startsWith(":")) {
+            key = key.substring(1);
+        } else { // key starts with !
+            key = key.substring(2);
+            exclaim = true;
+        }
+        key = ":" + name + "." + key;
+        if(exclaim) key = "!" + key;
+        return key;
     }
 
     private void handleInstruction(String line) {

@@ -169,7 +169,7 @@ public class StackMachine {
             break;
             case 0x0 : //print out debug info... non standard!
                 System.out.println("Current State of Stack Machine: ");
-                System.out.println("Memory: " + memory);
+                System.out.println("Memory: " + Arrays.toString(memory.from(0)));
                 System.out.println("PC: " + pc);
                 System.out.println("stack: " + Arrays.toString(memory.from(stack)));
                 break;

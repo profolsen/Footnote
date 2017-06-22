@@ -151,18 +151,22 @@ Each of these sections begins with ".declare", ".begin" or ".include" on a line 
 <b>The .include Section.</b>
 The .include section contains a list of files to include.  
 Files may be in the same directory, only the file name (.ftnt extension is assumed) is needed or files may be in a different directory, in which case the path and file name (.ftnt extension is assumed) are needed.
-All labels and constants from the included files are usable in the .begin section of the program.
-Variable, array, and string declarations are not usable, so names of variables, strings and arrays can be reused.
-An example of an include line could be:
+Any label, variable, constant, string and array from the included file is accessible by redirection.
+For example to access a variable called 'alex' from the file 'code', use the label ':code.alex'.
+Redirection can be done through multiple files.
+If your program includes a file X that includes a file Y that contains a string Z, then the correct way to access the string Z would be:
+<pre>:X.Y.Z</pre>
+An example of an include is:
 <pre>
 ; includeexample.ftnt
 .include
 ; ...
-modulus ;contains some code with the starting address labeled 'mod'.
+path/to/modulus ;contains some code with the starting address labeled 'mod'.
 ; ...
 .begin
 ; ...
-jal mod  ; using the included code.
+jal :modulus.mod  ; using the included code.
+                  ; notice that it is unnecessary to include the path.
 ; ...
 </pre>
 In this example, modulus.ftnt (contained in the same directory as includeexample.ftnt) contains a block of code with the label 'mod'.  
