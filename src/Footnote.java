@@ -2,6 +2,7 @@ import assembler.Assembler;
 import virtualmachine.StackMachine;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -170,7 +171,6 @@ public class Footnote {
                 return;
             }
             if (files[1] != null) {
-                System.out.println(files[1]);
                 answer.alsoRun = true;
                 try {
                     answer.out = new PrintStream(new FileOutputStream(files[1]));

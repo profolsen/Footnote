@@ -24,6 +24,8 @@ public class StackMachine {
 
     private int index = 0;
 
+    private boolean valid = false; //the program stored in the memory for this virtual machine is valid.
+
     public StackMachine(int memoryCapacity) {
         //stack = new LinkedList<Integer>();
         memory = new Memory(memoryCapacity);
@@ -50,7 +52,7 @@ public class StackMachine {
     public void push(int v) {
         if(stack == sL) {
             System.out.println("Overfull stack @" + pc);
-            System.exit(0);
+            valid = false;
         }
         memory.set(--stack, v);
     }
@@ -58,7 +60,7 @@ public class StackMachine {
     private int pop() {
         if(stack == memory.capacity()) {
             System.out.println("Over empty stack @" + pc);
-            System.exit(0);
+            valid = false;
         }
         int answer = memory.get(stack);
         stack++;
@@ -285,9 +287,10 @@ public class StackMachine {
     }
 
     public void run() {
+        if(!valid) return; //don't try to run invalid programs.
         int command = memory.get(pc);
         int count = 0;
-        while (command != 0xF) { //while command is not the halt command...
+        while (command != 0xF && valid) { //while command is not the halt command...
             exec(command);
             command = memory.get(pc);
             //System.out.println("\tcmd:" + command + "@" + pc);
@@ -296,9 +299,15 @@ public class StackMachine {
     }
 
     public void load(Scanner scan) {
-        while(scan.hasNextInt()) {
-            load(scan.nextInt());
+        while(scan.hasNextLine()) {
+            try {
+                load(Integer.parseInt(scan.nextLine()));
+            } catch(NumberFormatException nfe) {
+                System.out.println("Invalid Program");
+                return;
+            }
         }
+        valid = true;
     }
 
     public void load(int i) {
