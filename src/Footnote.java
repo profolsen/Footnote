@@ -14,12 +14,13 @@ public class Footnote {
     static class Options {
         boolean sym;
         boolean lines;
-        int memory;
+        int memory = DEFAULT_MEMORY_SIZE;
         int message;
         Scanner in;
         PrintStream out;
         boolean assemble = true;
-        boolean alsoRun = true;
+        boolean alsoRun = false;
+        String infile;
     }
 
     private static final int VERSION_REQUEST = 1;
@@ -41,12 +42,26 @@ public class Footnote {
                 for(String i : assembler.program()) {
                     options.out.println(i);
                 }
-            } else if(!options.assemble || options.alsoRun) {
+            }
+            if((!options.assemble) || options.alsoRun) {
+                if(options.assemble) {
+                    options.in.close();
+                    try {
+                        options.in = new Scanner(new File(dir(options.infile).getPath() + "/" + file(options.infile) + ".i"));
+                    } catch(FileNotFoundException fnfe) {
+                        System.out.println("Unable to run assembled file.");
+                        return;
+                    }
+                }
                 StackMachine m = new StackMachine(options.memory);
                 m.load(options.in);
                 m.run();
+                options.in.close();
+                return;
             }
         }
+        if(options.in != null) options.in.close();
+        if(options.out != null) options.out.close();
     }
 
     private static void printHelp() {
@@ -94,12 +109,14 @@ public class Footnote {
                     }
                 }
             } else if(!infile_set) {
-                File[] files = getPossibleInputs(args[i], new File(System.getProperty("user.dir")).listFiles());
+                File[] files = getPossibleInputs(file(args[i]), dir(args[i]).listFiles());
                 setAll(answer, files);
                 infilename = args[i];
+                answer.infile = args[i];
+                infile_set = true;
             } else {  //it has to be the outfile.
                 try {
-                    answer.out = new PrintStream(new FileOutputStream(new File(args[i])));
+                    answer.out = new PrintStream(new FileOutputStream(new File(dir(args[i]).getPath() + "/" + file(args[i]) + ".i")));
                 } catch (FileNotFoundException e) {
                     System.out.println("Could not open file" + args[i]);
                     answer.message = BAD_ARGUMENT;
@@ -115,15 +132,32 @@ public class Footnote {
             answer.message = BAD_ARGUMENT;
             return answer;
         }
-        if(answer.out == null) {
+        if(answer.out == null && answer.assemble) {
             try {
-                answer.out = new PrintStream(new FileOutputStream(new File(infilename + ".i")));
+                answer.out = new PrintStream(new FileOutputStream(new File(file(infilename) + ".i")));
             } catch (FileNotFoundException e) {
                 System.out.println("Could not open " + infilename + ".i");
                 answer.message = BAD_ARGUMENT;
             }
         }
         return answer;
+    }
+
+    private static String file(String arg) {
+        if(arg.contains("/")) {
+            arg = arg.substring(arg.lastIndexOf('/') + 1);
+        }
+        return arg;
+    }
+
+    private static File dir(String arg) {
+        if(arg.contains("/")) {
+            if(arg.startsWith("/")) return new File(arg.substring(0, arg.lastIndexOf('/') + 1));
+            arg = "/" + arg;
+            arg = System.getProperty("user.dir") + arg.substring(0, arg.lastIndexOf('/') + 1);
+            return new File(arg);
+        }
+        return new File(System.getProperty("user.dir"));
     }
 
     private static void setAll(Options answer, File[] files) {
@@ -136,6 +170,7 @@ public class Footnote {
                 return;
             }
             if (files[1] != null) {
+                System.out.println(files[1]);
                 answer.alsoRun = true;
                 try {
                     answer.out = new PrintStream(new FileOutputStream(files[1]));
