@@ -149,13 +149,10 @@ Programs written in the assembly language provided here are defined in three sec
 Each of these sections begins with ".declare", ".begin" or ".include" on a line by itself.
 
 <b>The .include Section.</b>
-The .include section contains a list of files to include.  
+The .include section contains a list of files to include.
 Files may be in the same directory, only the file name (.ftnt extension is assumed) is needed or files may be in a different directory, in which case the path and file name (.ftnt extension is assumed) are needed.
 Any label, variable, constant, string and array from the included file is accessible by redirection.
 For example to access a variable called 'alex' from the file 'code', use the label ':code.alex'.
-Redirection can be done through multiple files.
-If your program includes a file X that includes a file Y that contains a string Z, then the correct way to access the string Z would be:
-<pre>:X.Y.Z</pre>
 An example of an include is:
 <pre>
 ; includeexample.ftnt

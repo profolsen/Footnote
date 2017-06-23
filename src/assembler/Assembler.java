@@ -67,7 +67,6 @@ public class Assembler {
 
     public void assembleFirstPassOnly() {
         firstPass(false);
-        System.out.println(stringLocationMap);
         finish();
     }
 
@@ -210,6 +209,7 @@ public class Assembler {
     }
 
     private String redirectKey(String key, String name) {
+        if(key.contains(".")) return key;
         boolean exclaim = false;
         if(name.contains("/")) {   //get rid of paths in name.
             name = name.substring(name.lastIndexOf('/') + 1);
