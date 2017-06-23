@@ -28,9 +28,7 @@ public class Emulator {
         }
 
         int i = 0;
-        while(scan.hasNextInt()) {
-            sm.load(scan.nextInt());
-        }
+        sm.load(scan);
         sm.run();
     }
 }

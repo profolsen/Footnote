@@ -61,6 +61,7 @@ public class Footnote {
     }
 
     private static Options getOptions(String[] args) {
+        String infilename = null;
         Options answer = new Options();
         answer.message = NO_MESSAGE;
         answer.memory = DEFAULT_MEMORY_SIZE;
@@ -95,6 +96,7 @@ public class Footnote {
             } else if(!infile_set) {
                 File[] files = getPossibleInputs(args[i], new File(System.getProperty("user.dir")).listFiles());
                 setAll(answer, files);
+                infilename = args[i];
             } else {  //it has to be the outfile.
                 try {
                     answer.out = new PrintStream(new FileOutputStream(new File(args[i])));
@@ -111,6 +113,15 @@ public class Footnote {
         if(answer.in == null) {
             System.out.println("No input file specified.");
             answer.message = BAD_ARGUMENT;
+            return answer;
+        }
+        if(answer.out == null) {
+            try {
+                answer.out = new PrintStream(new FileOutputStream(new File(infilename + ".i")));
+            } catch (FileNotFoundException e) {
+                System.out.println("Could not open " + infilename + ".i");
+                answer.message = BAD_ARGUMENT;
+            }
         }
         return answer;
     }
