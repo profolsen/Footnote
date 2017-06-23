@@ -1,6 +1,3 @@
-import assembler.AllInOne;
-import emulator.Emulator;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -36,19 +33,6 @@ public class Test {
             trash.delete();
         }
         tempDir.delete();
-
-        /*
-
-        AllInOne.Main(new String[]{"samples/program.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/jaltestasm.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/memtestasm.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/stringtestasm.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/errtestasm.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/includetestasm.ftnt", "256"});
-        AllInOne.Main(new String[]{"samples/include_1.ftnt", "256"});
-        Emulator.main(new String[]{"samples/fibonacci.i", "256"});
-        AllInOne.Main(new String[]{"samples/memtestbadasm.ftnt", "256"});
-        */
     }
 
     private static void sleep(int i) {
