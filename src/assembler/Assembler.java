@@ -143,8 +143,9 @@ public class Assembler {
             program.add("" + 0x0);
             pc += 3;
         }
-
+        lineNo = 0;
         while(in.hasNextLine()) {
+            lineNo++;
             String line = in.nextLine();
             line = killComments(line).trim();
             if(line.equals("")) continue;
@@ -168,7 +169,6 @@ public class Assembler {
             } else {
                 handleInstruction(line, assembleBranchLabels);
             }
-            lineNo++;
         }
         if(assembleBranchLabels) {
 
