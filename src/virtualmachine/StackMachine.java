@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /**
  * Created by po917265 on 5/22/17.
@@ -291,6 +292,12 @@ public class StackMachine {
             command = memory.get(pc);
             //System.out.println("\tcmd:" + command + "@" + pc);
             count++;
+        }
+    }
+
+    public void load(Scanner scan) {
+        while(scan.hasNextInt()) {
+            load(scan.nextInt());
         }
     }
 

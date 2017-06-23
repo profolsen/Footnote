@@ -7,6 +7,47 @@ The project is called Footnote for two reasons:
 1. Just like a footnote, the set of instructions supported by the Footnote VM is extremely small.
 2. This project began as a footnote to a different project I was working on at the time but took on a life of it's own, very much like the footnotes of [David Foster Wallace](https://en.wikipedia.org/wiki/David_Foster_Wallace).
 
+Setup
+---------
+
+<b>Requirements.</b>
+This project requires java (version 1.5+) to run.  
+<b>Installation Steps.</b>
+Compile the java source files.  
+
+Running
+----------
+
+To run the program on the command line, change into the directory where the compiled code is kept and execute the line:
+<pre>java Footnote [options] infile [outfile]</pre>
+For infile and outfile, no extension should be specified.
+
+<b>Running with No Options and No outfile.</b> If no options or outfile is specified, then one of the following three things will occur:
+1. A program will be assembled.  This happens if infile unambiguously refers to infile.ftnt.
+In this case, the assembled program will be in infile.i.
+2. A program will be run.  This happens if infile unambiguously refers to infile.i.
+3. A program will be assembled and run.  This happens if infile is present with both .ftnt and .i extensions.
+In this case, infile.i  will be replaced with a reassembled version (from infile.ftnt file) and the new infile.i file will be run.
+
+<b>Outfile.</b>
+The outfile is only valid if infile.ftnt is present.
+If infile.ftnt is absent, an error will be printed.
+In this case, infile.ftnt will be assembled and saved to outfile.i.
+
+<b>Options.</b>
+1. <b>-version</b>  displays the current version.  
+If this flag is set, all other arguments are ignored and the version is printed.
+2. <b>-sym</b> valid only for assembly.  
+Saves the symbol table to symbols.txt
+3. <b>-lines</b> valid only for assembly.
+Saves the mapping from instruction counter in the assembled program to line of unassembled code.
+The map is saved to a file called linemap.txt
+4. <b>-memory amount</b> valid only for running.
+Sets the memory of the virtual machine to <b>amount</b> 32-bit integers.
+The default <b>amount</b> is 256.
+
+
+
 
 Virtual Machine Architecture
 -----------------
