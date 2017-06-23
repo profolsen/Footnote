@@ -83,6 +83,14 @@ public class Assembler {
     }
 
     private void secondPass() {
+        for(int i = 0; i < program.size(); i++) {  //some macros require relative targets for branching,
+            // we need to make these absolute now.
+            String x = program.get(i);
+            if(x.startsWith("+")) {
+                int target = i + Integer.parseInt(x.substring(1));
+                program.set(i, "" + target);
+            }
+        }
         for(int i = 0; i < variableCount; i++) {
             program.add("0");
         }
@@ -163,14 +171,7 @@ public class Assembler {
             lineNo++;
         }
         if(assembleBranchLabels) {
-            for(int i = 0; i < program.size(); i++) {  //some macros require relative targets for branching,
-                                                       // we need to make these absolute now.
-                String x = program.get(i);
-                if(x.startsWith("+")) {
-                    int target = i + Integer.parseInt(x.substring(1));
-                    program.set(i, "" + target);
-                }
-            }
+
         }
     }
 
