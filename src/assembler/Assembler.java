@@ -320,4 +320,12 @@ public class Assembler {
     public ArrayList<String> program() {
         return program;
     }
+
+    public Map<String, Integer> symbolTable() {
+        return symbolTable;
+    }
+
+    public Map<Integer, Integer> lineMap() {
+        return pc2line;
+    }
 }

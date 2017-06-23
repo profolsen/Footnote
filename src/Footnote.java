@@ -43,6 +43,26 @@ public class Footnote {
                 for(String i : assembler.program()) {
                     options.out.println(i);
                 }
+                if(options.sym) {
+                    try {
+                        PrintStream ps = new PrintStream(new FileOutputStream(new File("symbols.txt")));
+                        for(String symbol : assembler.symbolTable().keySet()) {
+                            ps.println(symbol + ", " + assembler.symbolTable().get(symbol));
+                        }
+                    } catch (FileNotFoundException e) {
+                        System.out.println("Failed to store symbol table.");
+                    }
+                }
+                if(options.lines) {
+                    try {
+                        PrintStream ps = new PrintStream(new FileOutputStream(new File("linemap.txt")));
+                        for(int pc : assembler.lineMap().keySet()) {
+                            ps.println(pc + ", " + assembler.lineMap().get(pc));
+                        }
+                    } catch (FileNotFoundException e) {
+                        System.out.println("Failed to store symbol table.");
+                    }
+                }
             }
             if((!options.assemble) || options.alsoRun) {
                 if(options.assemble) {
