@@ -245,7 +245,7 @@ public class Assembler {
     private void assemble(String[] parts, boolean assembleBranchLabels) {
         try {
             Instruction instruction = Instruction.valueOf(parts[0]);
-            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo, assembleBranchLabels);
+            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo);
             pc += assembled.length;
             for (String i : assembled) {
                 program.add(i);
