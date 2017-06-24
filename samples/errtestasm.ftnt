@@ -1,3 +1,9 @@
+.include
+doesntexist
+samples/include_err
+
+.begin
+
 jal :loop
 lda :array
 

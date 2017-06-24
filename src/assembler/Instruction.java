@@ -12,7 +12,7 @@ public enum Instruction {
     //instructions, and their syntax.
     jal(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[5];
             ans[0] = ("" + 0xD);
             //we need to do incrementing before the linking, so we link back to the correct location.
@@ -28,7 +28,7 @@ public enum Instruction {
     },
     jmp(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
             ans[0] = "" + 0xD;
@@ -43,7 +43,7 @@ public enum Instruction {
     },
     lda(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
@@ -68,7 +68,7 @@ public enum Instruction {
     },
     sda(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[8];
             String base = "!"+parts[1];  //base has to come this way.
             //we have to assume that index is on the stack already.
@@ -93,7 +93,7 @@ public enum Instruction {
     },
     beq(true, false) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[3];
             Integer address = symbolTable.get(parts[1]);
             ans[0] = "" + 0xD;
@@ -108,7 +108,7 @@ public enum Instruction {
     },
     ld(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[2];
             ans[0] = ("" + 0x2);
             pc++;
@@ -117,7 +117,7 @@ public enum Instruction {
 //            System.out.println(parts[1] + " :: " + symbolTable.get(parts[1]));
             if(address == null)
             {
-                error.println("Undefined variable @" + lineno);
+                error.println("Undefined variable @" + filename + ":" + lineno);
             }
             pc++;
             ans[1] = ("" + address);
@@ -140,14 +140,14 @@ public enum Instruction {
     cmp(new int[] {0x4, 0x5}),
     ldi(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xD);
             pc++;
             if(parts[1].startsWith(":")) {
                 Integer value = symbolTable.get(parts[1]);
                 if(value == null) {
-                    safePrint(error, "Undefined constant @" + lineno);
+                    safePrint(error, "Undefined constant @" + filename + ":" + lineno);
                 }
                 ans[1] = ("" + value);
             } else {
@@ -160,14 +160,14 @@ public enum Instruction {
     },
     down(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xB);
             pc++;
             if(parts[1].startsWith(":")) {
                 Integer value = symbolTable.get(parts[1]);
                 if(value == null) {
-                    safePrint(error, "Undefined constant @" + lineno);
+                    safePrint(error, "Undefined constant @" + filename + ":" + lineno);
                 }
                 ans[1] = ("" + value);
             } else {
@@ -179,14 +179,14 @@ public enum Instruction {
     },
     st(true, true) {
         @Override
-        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+        public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
             String[] ans = new String[2];
             ans[0] = ("" + 0xE);
             pc++;
             Integer address = symbolTable.get(parts[1]);
             if(address == null)
             {
-                System.out.println("Undefined variable: @" + lineno);
+                System.out.println("Undefined variable: @" + filename + ":" + lineno);
             }
             pc++;
             ans[1] = ("" + address);
@@ -234,16 +234,16 @@ public enum Instruction {
      * @param error where to print errors.  If null, no errors will be printed.
      * @param lineno the line number in the file where we got this line from.
      */
-    public void checkSyntax(String[] parts, PrintStream error, int lineno) {
+    public void checkSyntax(String[] parts, PrintStream error, int lineno, String filename) {
         if(!(takesLabel || takesValue) && parts.length > 1) {
-            safePrint(error, "Incorrect Argument Count for " + name() + " @" + lineno);
+            safePrint(error, "Incorrect Argument Count for " + name() + " @" + filename + ":" + lineno);
         } else if(takesLabel && !takesValue && !parts[1].startsWith(":")) {
-            safePrint(error, "Expected label but found " + parts[1] + " for " + name() + " @" + lineno);
+            safePrint(error, "Expected label but found " + parts[1] + " for " + name() + " @" + filename + ":" + lineno);
         } else if(!takesLabel && takesValue && !integer(parts[1])) {
-            safePrint(error, "Expected value but found " + parts[1] + " for " + name() + " @" + lineno);
+            safePrint(error, "Expected value but found " + parts[1] + " for " + name() + " @" + filename + ":" + lineno);
         } else if((takesLabel || takesValue) && !(integer(parts[1]) || parts[1].startsWith(":"))) {
             safePrint(error, "Expected label or value but found " + parts[1] + " for " + name() + " @" +
-                                lineno);
+                    filename + ":" + lineno);
         }
     }
 
@@ -277,12 +277,13 @@ public enum Instruction {
      * @param pc the program counter index of current instruction in assembled code.
      * @param error where to print a syntax error if it should occur.
      * @param lineno the line number the instruction being assembled came from.
+     * @param filename
      * @return the assembled instruction and updated pc.
      * position 0 is the updated pc, the rest is the assembled instruction.
      * symbols that cannot be resolved are put in the appropriate place in the assembled instruction
      * as symbols.
      */
-    public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno) {
+    public String[] assemble(String[] parts, HashMap<String, Integer> symbolTable, int pc, PrintStream error, int lineno, String filename) {
         if(code != null) {
             String[] ans = new String[code.length];
             for(int i = 0; i < ans.length; i++) {

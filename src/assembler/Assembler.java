@@ -2,7 +2,6 @@ package assembler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -15,7 +14,7 @@ public class Assembler {
     private ArrayList<String> program = new ArrayList<String>();
     private int pc = 0;
     private HashMap<Integer, String> stringLocationMap = new HashMap<Integer, String>();
-    private TreeMap<Integer, Integer> pc2line = new TreeMap<Integer, Integer>();
+    private TreeMap<Integer, String> pc2line = new TreeMap<Integer, String>();
     private Scanner in;
     private int variableCount = 0;
     private int index = 0;
@@ -24,50 +23,24 @@ public class Assembler {
     private HashSet<String> branchLabels = new HashSet<String>(); //need to keep track of branch labels
                 //for includes, because branch labels are always incorrect when loaded.  They need to be fixed.
                 //by an offset.
+    private String filename;
 
-    public Assembler(Scanner source) {
-        in = source;
+    public Assembler(File source) throws FileNotFoundException {
+        in = new Scanner(source);
         root = this;
+        filename = source.getName();
+        includedFiles.add(filename.substring(0, filename.lastIndexOf('.') + 1));
     }
 
-    public Assembler(Scanner source, Assembler root) {
+    public Assembler(File source, Assembler root) throws FileNotFoundException {
         this(source);
         this.root = root;
-    }
-
-    public static void main(String[] args) {
-        if(args.length != 2) {
-            System.out.println("Usage: Assembler infile outfile");
-            return;
-        }
-        Scanner scan = null;
-        try {
-            scan = new Scanner(new File(args[0]));
-        } catch (FileNotFoundException e) {
-            System.out.println("Could not open " + args[0]);
-            return;
-        }
-        PrintStream out = null;
-        try {
-            out = new PrintStream(args[1]);
-        } catch (FileNotFoundException e) {
-            System.out.println("Could not open " + args[1]);
-        }
-        Assembler assembler = new Assembler(scan);
-        assembler.includedFiles.add(args[0].trim());
-        assembler.assemble();
-        ArrayList<String> program = assembler.program();
-        //System.out.println(program);
-        for(String s : program) {
-            out.print(s + " ");
-        }
-        scan.close();
-        out.close();
     }
 
     public void assembleFirstPassOnly() {
         firstPass(false);
         finish();
+        in.close();
     }
 
     //a two pass assembler.
@@ -76,6 +49,7 @@ public class Assembler {
         firstPass(true);  //the first pass.
         secondPass();  //the second pass.
         finish(); //closing the scanner.
+        in.close();
     }
 
     private void finish() {
@@ -180,7 +154,7 @@ public class Assembler {
         if(! root.includedFiles.contains(filename)) {
             root.includedFiles.add(filename);
             try {
-                Assembler assm = new Assembler(new Scanner(new File(filename)), root);
+                Assembler assm = new Assembler(new File(filename), root);
                 assm.assembleFirstPassOnly();
                 ArrayList<String> result = assm.program();
                 //we don't want to include the variable stuff... but we __do__ want to include the
@@ -202,9 +176,10 @@ public class Assembler {
                 }
                 program.addAll(result);
                 pc += result.size();
+                pc2line.putAll(assm.pc2line);
                 variableCount += assm.variableCount;
             } catch (FileNotFoundException e) {
-                System.out.println("Could not find: " + filename);
+                System.out.println("Could not link " + filename + " @" + this.filename + ":" + lineNo);
             }
         } //including a file twice is not an error and has no effect.
     }
@@ -229,23 +204,23 @@ public class Assembler {
     private void handleInstruction(String line, boolean assembleBranchLabels) {
         String[] parts = line.split("\\s+");
         syntaxCheck(parts);
-        pc2line.put(pc, lineNo);
+        pc2line.put(pc, filename + ":" + lineNo);
         assemble(parts, assembleBranchLabels);
     }
 
     private void syntaxCheck(String[] parts) {
         try { //try to syntax check the instruction.
             Instruction instruction = Instruction.valueOf(parts[0]);
-            instruction.checkSyntax(parts, System.out, lineNo);
+            instruction.checkSyntax(parts, System.out, lineNo, filename);
         } catch(IllegalArgumentException iae) {  //invalid instruction name.  Report this.
-            System.out.println("Undefined Instruction " + parts[0] + " @" + lineNo);
+            System.out.println("Undefined Instruction " + parts[0] + " @" + filename + ":" + lineNo);
         }
     }
 
     private void assemble(String[] parts, boolean assembleBranchLabels) {
         try {
             Instruction instruction = Instruction.valueOf(parts[0]);
-            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo);
+            String[] assembled = instruction.assemble(parts, symbolTable, pc, System.out, lineNo, filename);
             pc += assembled.length;
             for (String i : assembled) {
                 program.add(i);
@@ -267,7 +242,7 @@ public class Assembler {
         try {
             return Integer.parseInt(number);
         } catch(Exception e) {
-            System.out.println("Invalid integer value @" + lineNo);
+            System.out.println("Invalid integer value @" + filename + ":" + lineNo);
             return Integer.MIN_VALUE;
         }
     }
@@ -276,21 +251,21 @@ public class Assembler {
         String[] parts = line.split("\\s+");
         if(parts.length == 1) {
             if(parts[0].contains(".")) {
-                System.out.println("Illegal variable name: " + parts[0] + " @ " + lineNo);
+                System.out.println("Illegal variable name: " + parts[0] + " @ " + filename + ":" + lineNo);
                 return;
             }
             symbolTable.put(line, --index);
             variableCount++;
         } else if(parts.length == 2) {
             if(parts[0].contains(".")) {
-                System.out.println("Illegal constant name: " + parts[0] + " @ " + lineNo);
+                System.out.println("Illegal constant name: " + parts[0] + " @ " + filename + ":" + lineNo);
                 return;
             }
             symbolTable.put(parts[0], parse(parts[1]));
         } else if(parts.length == 3 && parts[1].equals("length")) {
             try {
                 if(parts[0].contains(".")) {
-                    System.out.println("Illegal array name: " + parts[0] + " @ " + lineNo);
+                    System.out.println("Illegal array name: " + parts[0] + " @ " + filename + ":" + lineNo);
                     return;
                 }
                 int length = Integer.parseInt(parts[2]);
@@ -298,11 +273,11 @@ public class Assembler {
                 index -= length;
                 symbolTable.put(parts[0], index);
             } catch(NumberFormatException nfe) {
-                System.out.println("Illegal array length constant @" + lineNo);
+                System.out.println("Illegal array length constant @" + filename + ":" + lineNo);
             }
         } else if(parts.length >= 3 && parts[1].equals("is")) {
             if(parts[0].contains(".")) {
-                System.out.println("Illegal string name: " + parts[0] + " @ " + lineNo);
+                System.out.println("Illegal string name: " + parts[0] + " @ " + filename + ":" + lineNo);
                 return;
             }
             String[] pieces = line.split("\\s+", 3);
@@ -313,7 +288,7 @@ public class Assembler {
             symbolTable.put(pieces[0], index);
             stringLocationMap.put(index, pieces[2]);
         } else {
-            System.out.println("Illegal constant or variable declaration @" + lineNo);
+            System.out.println("Illegal constant or variable declaration @" + filename + ":" + lineNo);
         }
     }
 
@@ -325,7 +300,7 @@ public class Assembler {
         return symbolTable;
     }
 
-    public Map<Integer, Integer> lineMap() {
+    public Map<Integer, String> lineMap() {
         return pc2line;
     }
 }

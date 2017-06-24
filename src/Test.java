@@ -11,7 +11,7 @@ public class Test {
         tempDir.mkdir();
         File[] tests = (new File("samples/")).listFiles();
         for(File f : tests) {
-            if(f.getName().contains("include_2") || f.getName().contains("include_3") || f.getName().contains("modulus")) continue; //these are support files.
+            if(f.getName().contains("include_2") || f.getName().contains("include_3") || f.getName().contains("modulus") || f.getName().equals("include_err")) continue; //these are support files.
             System.out.println(f);
             try {
                 File toRun = new File(tempDir.getPath() + "/" + f.getName());

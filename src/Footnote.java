@@ -17,7 +17,7 @@ public class Footnote {
         boolean lines;
         int memory = DEFAULT_MEMORY_SIZE;
         int message;
-        Scanner in;
+        File in;
         PrintStream out;
         boolean assemble = true;
         boolean alsoRun = false;
@@ -38,7 +38,12 @@ public class Footnote {
             System.out.println(currentVersion);
         } else {//no message
             if(options.assemble) {
-                Assembler assembler = new Assembler(options.in);
+                Assembler assembler = null;
+                try {
+                    assembler = new Assembler(options.in);
+                } catch (FileNotFoundException e) {
+                    System.out.println("Could not open file: " + options.in);
+                }
                 assembler.assemble();
                 for(String i : assembler.program()) {
                     options.out.println(i);
@@ -66,23 +71,18 @@ public class Footnote {
             }
             if((!options.assemble) || options.alsoRun) {
                 if(options.assemble) {
-                    options.in.close();
-                    try {
-                        options.in = new Scanner(new File(dir(options.infile).getPath() + "/" + file(options.infile) + ".i"));
-                    } catch(FileNotFoundException fnfe) {
-                        System.out.println("Unable to run assembled file.");
-                        return;
-                    }
+                    options.in = new File(dir(options.infile).getPath() + "/" + file(options.infile) + ".i");
                 }
                 StackMachine m = new StackMachine(options.memory);
-                m.load(options.in);
+                try {
+                    m.load(new Scanner(options.in));
+                } catch (FileNotFoundException e) {
+                    System.out.println("Could not open " + options.in);
+                }
                 m.run();
-                options.in.close();
                 return;
             }
         }
-        if(options.in != null) options.in.close();
-        if(options.out != null) options.out.close();
     }
 
     private static void printHelp() {
@@ -183,13 +183,7 @@ public class Footnote {
 
     private static void setAll(Options answer, File[] files) {
         if(files[0] != null) {
-            try {
-                answer.in = new Scanner(files[0]);
-            } catch (FileNotFoundException e) {
-                System.out.println("Could not open file: " + files[0]);
-                answer.message = BAD_ARGUMENT;
-                return;
-            }
+            answer.in = files[0];
             if (files[1] != null) {
                 answer.alsoRun = true;
                 try {
@@ -201,13 +195,7 @@ public class Footnote {
             }
         } else if(files[1] != null) {
             answer.assemble = false;  //this is the running a program case.
-            try {
-                answer.in = new Scanner(files[1]);
-            } catch (FileNotFoundException e) {
-                System.out.println("Could not open file: " + files[1]);
-                answer.message = BAD_ARGUMENT;
-                return;
-            }
+            answer.in = files[1];
         }
     }
 
