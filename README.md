@@ -103,21 +103,20 @@ Finally, there is a short description of what the instruction does.
        <col span="1" style="width: 25%;">
        <col span="1" style="width: 50%;">
     </colgroup>
-    
     <thead>
-    <th>Name [args]</th>
-    <th>Opcode</th>
-    <th>Effect on Stack</th>
-    <th>Description</th>
+       <th>Name [args]</th>
+       <th>Opcode</th>
+       <th>Effect on Stack</th>
+       <th>Description</th>
     </thead>
     <tbody>
-    <tr>
-    <td>jmp</td>
-    <td>0x0</td>
-    <td>x... -> ...</td>
-    <td>This instruction pops the top value off the stack and goes to that position.</td>
-    </tr>
-    <tr>
+       <tr>
+         <td>jmp</td>
+         <td>0x0</td>
+         <td>x... -> ...</td>
+         <td>This instruction pops the top value off the stack and goes to that position.</td>
+       </tr>
+       <tr>
     <td>beq</td>
     <td>0x1</td>
     <td>x y z... -> ...</td>
