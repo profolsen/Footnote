@@ -103,7 +103,7 @@ Finally, there is a short description of what the instruction does.
        <col span="1" style="width: 25%;">
        <col span="1" style="width: 50%;">
     </colgroup>
-    <!-- Put <thead>, <tbody>, and <tr>'s here! -->
+    
     <thead>
     <th>Name [args]</th>
     <th>Opcode</th>
@@ -112,28 +112,34 @@ Finally, there is a short description of what the instruction does.
     </thead>
     <tbody>
     <tr>
-    <td>dup</td>
-    <td>0xA</td>
-    <td>x... -> x x...</td>
-    <td>This instruction pushes a duplicate of the value on top of the stack.</td>
+    <td>jmp</td>
+    <td>0x0</td>
+    <td>x... -> ...</td>
+    <td>This instruction pops the top value off the stack and goes to that position.</td>
     </tr>
     <tr>
-    <td>down val</td>
-    <td>0xB</td>
-    <td>val = 1: <nobr>x&nbspy...&nbsp->&nbspy&nbspx...</nobr> val = 2: <nobr>x&nbspy&nbspz...&nbsp->&nbspy&nbspz&nbspx...</nobr></td>
-    <td>This instruction moves the top element on the stack val levels deep into the stack.</td>
+    <td>beq</td>
+    <td>0x1</td>
+    <td>x y z... -> ...</td>
+    <td>This instruction branches pops the top three values off the stack. If the second two popped values are equal, it branches to the first popped value.</td>
+    </tr>
+    <tr>
+    <td>ld location</td>
+    <td>0x2</td>
+    <td><nobr>...&nbsp-> (val&nbspat&nbsplocation)...</nobr></td>
+    <td>This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.</td>
+    </tr>
+    <tr>
+    <td>sys code</td>
+    <td>0x3</td>
+    <td>Dependent on Code</td>
+    <td>This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.</td>
     </tr>
     <tr>
     <td>iarith</td>
     <td>0x4</td>
     <td><nobr>x&nbspy...&nbsp->&nbspf(x,&nbspy)...</nobr></td>
     <td>This instruction applies a mathematical function to the top two stack elements. The function this instruction executes depends on the argument code which must be supplied. See <b>Integer Arithmetic Extended Instructions</b> below for details.</td>
-    </tr>
-    <tr>
-    <td>undefined</td>
-    <td>0xC</td>
-    <td>No Stack Effects</td>
-    <td>This instruction does nothing.</td>
     </tr>
     <tr>
     <td>farith code</td>
@@ -154,18 +160,6 @@ Finally, there is a short description of what the instruction does.
     <td>This instruction does nothing.</td>
     </tr>
     <tr>
-    <td>jmp</td>
-    <td>0x0</td>
-    <td>x... -> ...</td>
-    <td>This instruction pops the top value off the stack and goes to that position.</td>
-    </tr>
-    <tr>
-    <td>beq</td>
-    <td>0x1</td>
-    <td>x y z... -> ...</td>
-    <td>This instruction branches pops the top three values off the stack. If the second two popped values are equal, it branches to the first popped value.</td>
-    </tr>
-    <tr>
     <td>zero</td>
     <td>0x8</td>
     <td>... -> 0...</td>
@@ -178,34 +172,40 @@ Finally, there is a short description of what the instruction does.
     <td>This instruction pushes a one on the top of the stack.</td>
     </tr>
     <tr>
-    <td>ld location</td>
-    <td>0x2</td>
-    <td><nobr>...&nbsp-> (val&nbspat&nbsplocation)...</nobr></td>
-    <td>This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.</td>
+    <td>dup</td>
+    <td>0xA</td>
+    <td>x... -> x x...</td>
+    <td>This instruction pushes a duplicate of the value on top of the stack.</td>
     </tr>
     <tr>
-    <td>sys code</td>
-    <td>0x3</td>
-    <td>Dependent on Code</td>
-    <td>This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.</td>
+    <td>down val</td>
+    <td>0xB</td>
+    <td>val = 1: <nobr>x&nbspy...&nbsp->&nbspy&nbspx...</nobr> val = 2: <nobr>x&nbspy&nbspz...&nbsp->&nbspy&nbspz&nbspx...</nobr></td>
+    <td>This instruction moves the top element on the stack val levels deep into the stack.</td>
     </tr>
     <tr>
-    <td>st location</td>
-    <td>0xE</td>
-    <td>x... -> ...</td>
-    <td>This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.</td>
-    </tr>||||
-    <tr>
-    <td>hlt</td>
-    <td>0xF</td>
-    <td>No Stack Effects.</td>
-    <td>This instruction terminates a program.|</td>
+    <td>undefined</td>
+    <td>0xC</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
     </tr>
     <tr>
     <td>ldi val</td>
     <td>0xD</td>
     <td>... -> val...</td>
     <td>This instruction pushes the next value onto the stack.</td>
+    </tr>    
+    <tr>
+    <td>st location</td>
+    <td>0xE</td>
+    <td>x... -> ...</td>
+    <td>This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.</td>
+    </tr>
+    <tr>
+    <td>hlt</td>
+    <td>0xF</td>
+    <td>No Stack Effects.</td>
+    <td>This instruction terminates a program.|</td>
     </tr>
     </tbody>
 </table>
