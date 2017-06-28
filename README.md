@@ -101,29 +101,19 @@ Finally, there is a short description of what the instruction does.
 |   dup     |  0xA |     x... -> x x...        |this instruction pushes a duplicate of the value on top of the stack.|
 |  down val |  0xB |<nobr>val = 1: x y... -> y x...</nobr><nobr> val = 2: x y z... -> y z x...</nobr>| this instruction moves the top element on the stack val levels deep into the stack.|
 |iarith code|0x4|<nobr>x y... -> f(x, y)...</nobr>|this instruction applies a mathematical function to the top two stack elements. The function this instruction executes depends on the argument code which must be supplied. See <b>Integer Arithmetic Extended Instructions</b> below for details.|
-
-* undefined (0xC) | (no stack effects) This instruction does nothing.   
-* farith code (0x5) | (x y... -> f(x, y)...) This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack.
-Currently, no floating point operations are defined.
-* undefined (0x6) | (no stack effects) This instruction does nothing. 
-* undefined (0x7) | (no stack effects) This instruction does nothing. 
-* jmp (0x0) | (x... -> ...) this instruction pops the top value off the stack and goes to that position.
-* beq (0x1) | (x y z... -> ...) this instruction branches pops the top three values off the stack.
-If the second two popped values are equal, it branches to the first popped value.
-* zero (0x8) | (... -> 0...) this instruction pushes a zero on the top of the stack.
-* one (0x9) | (... -> 1...) this instruction pushes a one on the top of the stack.
-* ld location (0x2) | (... -> val&#64;location...) this instruction pushes a value from a specified location in memory (location) onto the top of the stack.
-This instruction has two modes, determined by the value of location.
-(Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack.
-(Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.
-* sys code (0x3) | (no before and after shown) this instruction handles system calls.
-The code determines which action is taken by the system.
-Additional arguments (if any) must be on the stack and will be popped off the stack after execution.
-For more information on system calls, see <b>System Calls</b> below.
-* st location (0xE) | (x... -> ...) this instruction pops a value of the top of the stack and stores in in a specified address in memory (location).
-Like ld, this instruction operates in two modes, see ld for details.
-* hlt (0x15) |  this instruction signals the end of a program.
-* ldi val (0xD) | (... -> val...) this instruction pushes the next value onto the stack.
+|undefine|0xC|no stack effects|This instruction does nothing.|  
+|farith code|0x5|x y... -> f(x, y)...|This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack. Currently, no floating point operations are defined.|
+|undefined|0x6|no stack effects|This instruction does nothing.| 
+|undefined|0x7|no stack effects|This instruction does nothing.|
+|jmp|0x0|x... -> ...|This instruction pops the top value off the stack and goes to that position.|
+|beq|0x1|x y z... -> ...|This instruction branches pops the top three values off the stack. If the second two popped values are equal, it branches to the first popped value.|
+|zero|0x8|... -> 0...|This instruction pushes a zero on the top of the stack.|
+|one|0x9|... -> 1...|This instruction pushes a one on the top of the stack.|
+|ld location|0x2|... -> (val at location)...|This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.|
+|sys code|0x3|no before and after shown|This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.|
+|st location|0xE|x... -> ...|This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.|
+|hlt|0x15|no stack effects|This instruction signals the end of a program.|
+|ldi val|0xD|... -> val...|This instruction pushes the next value onto the stack.|
 
 <b>Integer Arithmetic Extended Instructions</b>
 An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
