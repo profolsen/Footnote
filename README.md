@@ -95,6 +95,11 @@ On the left, the before image of the stack is given by the first or first few it
 On the right, the after image of the stack is given by redrawing the first few items of the stack after the instruction is performed, again followed by an ellipsis.
 For example, if the stack effect is pictured as (x y... -> y x...), then this means that the top two values on the stack are reversed in order.
 Finally, there is a short description of what the instruction does.
+|name|opcode|effect on stack|description|
+|---|---|---|---|
+|dup|0xA|x... -> x x...|this instruction pushes a duplicate of the value on top of the stack.
+
+
 * dup (0xA) | (x... -> x x...) this instruction pushes a duplicate of the value on top of the stack.
 * down val (0xB) | [val = 1: (x y... -> y x...), val = 2: (x y z... -> y z x...)] this instruction moves the top element on the stack val levels deep into the stack.
 * iarith code (0x4) | (x y... -> f(x, y)...) this instruction applies a mathematical function to the top two stack elements.
