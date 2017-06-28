@@ -83,6 +83,7 @@ For example, if the first two sections together use 130 integers of memory, then
 
 <b>Instructions.</b>
 The following table provides details about the instructions the Footnote VM can interpret.
+
 Preliminary notes:
 * Arguments. Some of the instructions in the table below require arguments.
 There are no instructions with optional arguments.
