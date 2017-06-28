@@ -96,6 +96,22 @@ On the right, the after image of the stack is given by redrawing the first few i
 For example, if the stack effect is pictured as (x y... -> y x...), then this means that the top two values on the stack are reversed in order.
 Finally, there is a short description of what the instruction does.
 
+<table>
+    <colgroup>
+       <col span="1" style="width: 12.5%;">
+       <col span="1" style="width: 12.5%;">
+       <col span="1" style="width: 25%;">
+       <col span="1" style="width: 50%;">
+    </colgroup>
+    <!-- Put <thead>, <tbody>, and <tr>'s here! -->
+    <thead>
+    <th>Name [args]</th>
+    <th>Opcode</th>
+    <th>Effect on Stack</th>
+    <th>Description</th>
+    </thead>
+</table>
+
 |name [args]|opcode|     effect on stack       |          description             |
 |---|---|---------------------------|----------------------------------|
 |   dup     |  0xA |     x... -> x x...        |this instruction pushes a duplicate of the value on top of the stack.|
