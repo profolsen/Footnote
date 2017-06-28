@@ -84,9 +84,11 @@ For example, if the first two sections together use 130 integers of memory, then
 <b>Instructions.</b>
 The following table provides details about the instructions the Footnote VM can interpret.
 Preliminary notes:
-* There are no instructions with optional arguments.
+* Arguments. Some of the instructions in the table below require arguments.
+There are no instructions with optional arguments.
 If an instruction takes arguments, they must be given.
-* The effect of the instruction on the stack (if there is one) is specified.
+The argument must follow directly as the next 32 bit integer in the program after the instruction it is for.
+* Stack Effects. The effect of the instruction on the stack is also specified in the table below.
 The effect is described by providing a before and after picture of the stack relative to the instruction being discussed.
 On the left, the before image of the stack is given by the first or first few items on the stack followed by an ellipsis (...) representing the rest of the items on the stack.
 On the right, the after image of the stack is given by redrawing the first few items of the stack after the instruction is performed, again followed by an ellipsis.
@@ -100,9 +102,9 @@ For example, if the stack effect for an instruction is shown as (x y... -> y x..
        <col span="1" style="width: 45%;">
     </colgroup>
     <thead>
-       <th>Name [args]</th>
+       <th>Name [argument]</th>
        <th>Opcode</th>
-       <th>Effect on Stack</th>
+       <th>Stack Effect</th>
        <th>Description</th>
     </thead>
     <tbody>
