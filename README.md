@@ -96,15 +96,13 @@ On the right, the after image of the stack is given by redrawing the first few i
 For example, if the stack effect is pictured as (x y... -> y x...), then this means that the top two values on the stack are reversed in order.
 Finally, there is a short description of what the instruction does.
 
-|name|opcode|effect on stack|description|
+|name [args]|opcode|effect on stack|description|
 |---|---|---|---|
-|dup|0xA|x... -> x x...|this instruction pushes a duplicate of the value on top of the stack.
+|dup|0xA|x... -> x x...|this instruction pushes a duplicate of the value on top of the stack.|
+|down val|0xB|[val = 1: (x y... -> y x...), val = 2: (x y z... -> y z x...)]| this instruction moves the top element on the stack val levels deep into the stack.|
+|iarith code|0x4|x y... -> f(x, y)...|this instruction applies a mathematical function to the top two stack elements.
+The function this instruction executes depends on the argument code which must be supplied.|
 
-
-* dup (0xA) | (x... -> x x...) this instruction pushes a duplicate of the value on top of the stack.
-* down val (0xB) | [val = 1: (x y... -> y x...), val = 2: (x y z... -> y z x...)] this instruction moves the top element on the stack val levels deep into the stack.
-* iarith code (0x4) | (x y... -> f(x, y)...) this instruction applies a mathematical function to the top two stack elements.
-The function this instruction executes depends on the argument code which must be supplied.
 See <b>Integer Arithmetic Extended Instructions</b> below for details.
 * undefined (0xC) | (no stack effects) This instruction does nothing.   
 * farith code (0x5) | (x y... -> f(x, y)...) This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack.
