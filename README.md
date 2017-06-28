@@ -180,36 +180,42 @@ Finally, there is a short description of what the instruction does.
     <tr>
     <td>ld location</td>
     <td>0x2</td>
-    <td><nobr>...&nbsp->&nbsp(val&nbspat&nbsplocation)...</nobr></td>
+    <td><nobr>...&nbsp-> (val&nbspat&nbsplocation)...</nobr></td>
     <td>This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.</td>
     </tr>
     <tr>
-    <td>undefined</td>
-    <td>0xC</td>
-    <td>No Stack Effects</td>
-    <td>This instruction does nothing.</td>
+    <td>sys code</td>
+    <td>0x3</td>
+    <td>Dependent on Code</td>
+    <td>This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.</td>
     </tr>
     <tr>
-    <td>undefined</td>
-    <td>0xC</td>
-    <td>No Stack Effects</td>
-    <td>This instruction does nothing.</td>
+    <td>st location</td>
+    <td>0xE</td>
+    <td>x... -> ...</td>
+    <td>This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.</td>
+    </tr>||||
+    <tr>
+    <td>hlt</td>
+    <td>0xF</td>
+    <td>No Stack Effects.</td>
+    <td>This instruction terminates a program.|</td>
     </tr>
     <tr>
-    <td>undefined</td>
-    <td>0xC</td>
-    <td>No Stack Effects</td>
-    <td>This instruction does nothing.</td>
+    <td>ldi val</td>
+    <td>0xD</td>
+    <td>... -> val...</td>
+    <td>This instruction pushes the next value onto the stack.</td>
     </tr>
     </tbody>
 </table>
 
 
 
-|sys code|0x3|no before and after shown|This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.|
-|st location|0xE|x... -> ...|This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.|
-|hlt|0x15|no stack effects|This instruction signals the end of a program.|
-|ldi val|0xD|... -> val...|This instruction pushes the next value onto the stack.|
+
+
+
+
 
 <b>Integer Arithmetic Extended Instructions</b>
 An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
