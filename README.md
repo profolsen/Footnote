@@ -82,19 +82,15 @@ Unlike the Data section which must be explicitly initialized by the user, the st
 For example, if the first two sections together use 130 integers of memory, then the stack section will comprise the remaining 126 integers of memory, assuming there are 256 integers of memory in total.
 
 <b>Instructions.</b>
-Each instruction will be defined and discussed using the format described below:
-- [name (opcode)] [args] | [(before -> after) description]
-
-Each list item begins by giving the name and the opcode (in hexadecimal) for the instruction.
-Then, the arguments taken by the instruction are given.
-There are no instructions with optional arguments.
+The following table provides details about the instructions the Footnote VM can interpret.
+Preliminary notes:
+* There are no instructions with optional arguments.
 If an instruction takes arguments, they must be given.
-After the vertical bar "<b>|</b>", the effect of the instruction on the stack (if there is one) is specified.  
+* The effect of the instruction on the stack (if there is one) is specified.
 The effect is described by providing a before and after picture of the stack relative to the instruction being discussed.
 On the left, the before image of the stack is given by the first or first few items on the stack followed by an ellipsis (...) representing the rest of the items on the stack.
 On the right, the after image of the stack is given by redrawing the first few items of the stack after the instruction is performed, again followed by an ellipsis.
-For example, if the stack effect is pictured as (x y... -> y x...), then this means that the top two values on the stack are reversed in order.
-Finally, there is a short description of what the instruction does.
+For example, if the stack effect for an instruction is shown as (x y... -> y x...), then that instruction reverses the order of the top two values on the stack.
 
 <table>
     <colgroup>
