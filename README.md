@@ -120,7 +120,7 @@ Finally, there is a short description of what the instruction does.
     <tr>
     <td>down val</td>
     <td>0xB</td>
-    <td>val = 1: <nobr>x y... -> y x...</nobr> val = 2: <nobr>x y z... -> y z x...</nobr></td>
+    <td>val = 1: <nobr>x y... -> y x...</nobr><br> val = 2: <nobr>x y z... -> y z x...</nobr></td>
     <td>This instruction moves the top element on the stack val levels deep into the stack.</td>
     </tr>
     </tbody>
