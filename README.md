@@ -144,7 +144,7 @@ Finally, there is a short description of what the instruction does.
     <td>farith code</td>
     <td>0x5</td>
     <td><nobr>x&nbspy...&nbsp->&nbspf(x,&nbspy)...</nobr></td>
-    <td>This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack. Currently, no floating point operations are defined.|</td>
+    <td>This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack. Currently, no floating point operations are defined.</td>
     </tr>
     <tr>
     <td>undefined</td>
