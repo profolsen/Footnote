@@ -100,8 +100,8 @@ Finally, there is a short description of what the instruction does.
     <colgroup>
        <col span="1" style="width: 12.5%;">
        <col span="1" style="width: 12.5%;">
-       <col span="1" style="width: 25%;">
-       <col span="1" style="width: 50%;">
+       <col span="1" style="width: 30%;">
+       <col span="1" style="width: 45%;">
     </colgroup>
     <!-- Put <thead>, <tbody>, and <tr>'s here! -->
     <thead>
