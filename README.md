@@ -110,6 +110,20 @@ Finally, there is a short description of what the instruction does.
     <th>Effect on Stack</th>
     <th>Description</th>
     </thead>
+    <tbody>
+    <tr>
+    <td>dup</td>
+    <td>0xA</td>
+    <td>x... -> x x...</td>
+    <td>This instruction pushes a duplicate of the value on top of the stack.</td>
+    </tr>
+    <tr>
+    <td>down val</td>
+    <td>0xB</td>
+    <td><nobr>val = 1: x y... -> y x...</nobr><nobr> val = 2: x y z... -> y z x...</nobr></td>
+    <td>This instruction moves the top element on the stack val levels deep into the stack.</td>
+    </tr>
+    </tbody>
 </table>
 
 |name [args]|opcode|     effect on stack       |          description             |
