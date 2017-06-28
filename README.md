@@ -100,8 +100,8 @@ Finally, there is a short description of what the instruction does.
     <colgroup>
        <col span="1" style="width: 12.5%;">
        <col span="1" style="width: 12.5%;">
-       <col span="1" style="width: 30%;">
-       <col span="1" style="width: 45%;">
+       <col span="1" style="width: 25%;">
+       <col span="1" style="width: 50%;">
     </colgroup>
     <!-- Put <thead>, <tbody>, and <tr>'s here! -->
     <thead>
@@ -123,23 +123,89 @@ Finally, there is a short description of what the instruction does.
     <td>val = 1: <nobr>x&nbspy...&nbsp->&nbspy&nbspx...</nobr> val = 2: <nobr>x&nbspy&nbspz...&nbsp->&nbspy&nbspz&nbspx...</nobr></td>
     <td>This instruction moves the top element on the stack val levels deep into the stack.</td>
     </tr>
+    <tr>
+    <td>iarith</td>
+    <td>0x4</td>
+    <td><nobr>x&nbspy...&nbsp->&nbspf(x,&nbspy)...</nobr></td>
+    <td>This instruction applies a mathematical function to the top two stack elements. The function this instruction executes depends on the argument code which must be supplied. See <b>Integer Arithmetic Extended Instructions</b> below for details.</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0xC</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
+    <tr>
+    <td>farith code</td>
+    <td>0x5</td>
+    <td><nobr>x&nbspy...&nbsp->&nbspf(x,&nbspy)...</nobr></td>
+    <td>This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack. Currently, no floating point operations are defined.|</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0x6</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0x7</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
+    <tr>
+    <td>jmp</td>
+    <td>0x0</td>
+    <td>x... -> ...</td>
+    <td>This instruction pops the top value off the stack and goes to that position.</td>
+    </tr>
+    <tr>
+    <td>beq</td>
+    <td>0x1</td>
+    <td>x y z... -> ...</td>
+    <td>This instruction branches pops the top three values off the stack. If the second two popped values are equal, it branches to the first popped value.</td>
+    </tr>
+    <tr>
+    <td>zero</td>
+    <td>0x8</td>
+    <td>... -> 0...</td>
+    <td>This instruction pushes a zero on the top of the stack.</td>
+    </tr>
+    <tr>
+    <td>one</td>
+    <td>0x9</td>
+    <td>... -> 1...</td>
+    <td>This instruction pushes a one on the top of the stack.</td>
+    </tr>
+    <tr>
+    <td>ld location</td>
+    <td>0x2</td>
+    <td><nobr>...&nbsp->&nbsp(val&nbspat&nbsplocation)...</nobr></td>
+    <td>This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0xC</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0xC</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
+    <tr>
+    <td>undefined</td>
+    <td>0xC</td>
+    <td>No Stack Effects</td>
+    <td>This instruction does nothing.</td>
+    </tr>
     </tbody>
 </table>
 
-|name [args]|opcode|     effect on stack       |          description             |
-|---|---|---------------------------|----------------------------------|
-|   dup     |  0xA |     x... -> x x...        |this instruction pushes a duplicate of the value on top of the stack.|
-|  down val |  0xB |<nobr>val = 1: x y... -> y x...</nobr><nobr> val = 2: x y z... -> y z x...</nobr>| this instruction moves the top element on the stack val levels deep into the stack.|
-|iarith code|0x4|<nobr>x y... -> f(x, y)...</nobr>|this instruction applies a mathematical function to the top two stack elements. The function this instruction executes depends on the argument code which must be supplied. See <b>Integer Arithmetic Extended Instructions</b> below for details.|
-|undefine|0xC|no stack effects|This instruction does nothing.|  
-|farith code|0x5|x y... -> f(x, y)...|This instruction pops the top two values from the stack, performs some floating point operation (designated by the code argument) on them and pushes the result to the stack. Currently, no floating point operations are defined.|
-|undefined|0x6|no stack effects|This instruction does nothing.| 
-|undefined|0x7|no stack effects|This instruction does nothing.|
-|jmp|0x0|x... -> ...|This instruction pops the top value off the stack and goes to that position.|
-|beq|0x1|x y z... -> ...|This instruction branches pops the top three values off the stack. If the second two popped values are equal, it branches to the first popped value.|
-|zero|0x8|... -> 0...|This instruction pushes a zero on the top of the stack.|
-|one|0x9|... -> 1...|This instruction pushes a one on the top of the stack.|
-|ld location|0x2|... -> (val at location)...|This instruction pushes a value from a specified location in memory (location) onto the top of the stack. This instruction has two modes, determined by the value of location. (Absolute Mode) If location is greater than or equal to 0, it is treated like memory address, the value stored at that location is put on top of the stack. (Relative Mode) If location is less than zero, it is treated like a relative address, and the value stored at the memory address equal to the maximum stack height plus location is pushed onto the stack.|
+
+
 |sys code|0x3|no before and after shown|This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.|
 |st location|0xE|x... -> ...|This instruction pops a value of the top of the stack and stores in in a specified address in memory (location). Like ld, this instruction operates in two modes, see ld for details.|
 |hlt|0x15|no stack effects|This instruction signals the end of a program.|
