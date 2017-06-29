@@ -367,7 +367,7 @@ There are three kinds of arguments an instruction can have:
 2. address - a variable, string, or array representing a location in memory.
 3. label - a branch label.
 
-Some instructions are macros, i.e., they are assembled into several machine instructions.  These instructions will are marked "yes" in the macro column.
+Some instructions are macros, i.e., they are assembled into several machine instructions.  These instructions are marked "yes" in the macro column.
 
 |Name|Macro|Argument|Description|
 |---|---|---|---|
