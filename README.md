@@ -217,6 +217,7 @@ For example, if the stack effect for an instruction is shown as (x y... -> y x..
 <b>Integer Arithmetic Extended Instructions</b>
 An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
 It then executes a mathematical operation on them (e.g., add) and pushes the result to the stack.
+
 |name|code|description|
 |---|---|---|
 |add|0x1|Adds the top two values on the stack together.|
