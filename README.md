@@ -217,16 +217,16 @@ For example, if the stack effect for an instruction is shown as (x y... -> y x..
 <b>Integer Arithmetic Extended Instructions</b>
 An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
 It then executes a mathematical operation on them (e.g., add) and pushes the result to the stack.
-When describing various integer arithmetic calls, the following format is used:
-* code (name) - description
-* 0x1 (add) - adds the top two values on the stack together.
-* 0x2 (sub) - subtracts the second to top value on the stack from the top value on the stack.
-* 0x3 (mul) - multiplies the top two values on the stack together.
-* 0x4 (div) - divides the top value on the stack by the second to top value on the stack.
-* 0x5 (cmp) - this instruction compares the top two values on the stack.
+|name|code|description|
+|---|---|---|
+|add|0x1|Adds the top two values on the stack together.|
+|sub|0x2|Subtracts the second to top value on the stack from the top value on the stack.|
+|mul|0x3|Multiplies the top two values on the stack together.|
+|div|0x4|Divides the top value on the stack by the second to top value on the stack.|
+|cmp|0x5|This instruction compares the top two values on the stack.
 If the two values are equal, a zero is pushed.
 If the top value is greater, a one is pushed.
-If the top value is less than the second to top value, a negative 1 is pushed.
+If the top value is less than the second to top value, a negative 1 is pushed.|
 
 <b>System Calls.</b>
 When describing various system calls, the following format is used:
