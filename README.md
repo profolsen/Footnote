@@ -1,4 +1,5 @@
 # Footnote
+!(https://travis-ci.org/profolsen/Footnote.svg?branch=master)
 
 Name
 -----
