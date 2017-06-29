@@ -133,7 +133,7 @@ For example, if the stack effect for an instruction is shown as (x y... -> y x..
     <td>This instruction handles system calls. The code determines which action is taken by the system. Additional arguments (if any) must be on the stack and will be popped off the stack after execution. For more information on system calls, see <b>System Calls</b> below.</td>
     </tr>
     <tr>
-    <td>iarith</td>
+    <td>iarith code</td>
     <td>0x4</td>
     <td><nobr>x&nbspy...&nbsp->&nbspf(x,&nbspy)...</nobr></td>
     <td>This instruction applies a mathematical function to the top two stack elements. The function this instruction executes depends on the argument code which must be supplied. See <b>Integer Arithmetic Extended Instructions</b> below for details.</td>
@@ -218,7 +218,7 @@ For example, if the stack effect for an instruction is shown as (x y... -> y x..
 An integer arithmetic extended instruction always obtains its arguments by popping the top two values from the stack.
 It then executes a mathematical operation on them (e.g., add) and pushes the result to the stack.
 
-|name|code|description|
+|Name|Code|Description|
 |---|---|---|
 |add|0x1|Adds the top two values on the stack together.|
 |sub|0x2|Subtracts the second to top value on the stack from the top value on the stack.|
@@ -227,19 +227,16 @@ It then executes a mathematical operation on them (e.g., add) and pushes the res
 |cmp|0x5|This instruction compares the top two values on the stack. If the two values are equal, a zero is pushed. If the top value is greater, a one is pushed. If the top value is less than the second to top value, a negative 1 is pushed.|
 
 <b>System Calls.</b>
-When describing various system calls, the following format is used:
-* code (arg1, arg2, ..., argn) - description
+A system call is performed when the sys instruction is encountered by the Footnote VM.
+Which system call will be performed depends on the code argument to the sys instruction.
 
-The code determines which system call will be executed.
-The list in parenthesis gives the names of all arguments the system call requires.
-If the system call requires no arguments, empty parentheses will be shown.
-After the code and arguments list, the action of the call is described.
-* 0x1 () - prints the value on top of the stack to the screen in decimal.
-* 0x2 () - Interprets the value on top of the stack as an ASCII character and then prints it to the screen.
-* 0x3 () - prints a newline character to the screen.
-* 0x4 () - user input through keyboard.
-An integer corresponding to a typed key is pushed on the stack.
-the integer-key mapping is system dependent.
+|Name|Code|Args|Description|
+|---|---|---|---|
+|print|0x1|None|Prints the value on top of the stack to the standard output in decimal.|
+|printch|0x2|None|Interprets the value on top of the stack as an ASCII character and then prints it to the screen.|
+|println|0x3|None|Prints a newline character to the standard output.|
+|read|0x4|None|User input through keyboard. An integer corresponding to a typed key is pushed on the stack. The integer-key mapping is system dependent.|
+
 
 <b>Example Program (Fibonacci Numbers).</b>
 The following program is designed to print out the first few fibonacci numbers (up through 233).
@@ -363,45 +360,36 @@ Therefore, this program is an infinite loop: the jmp instruction branches to its
 A label is a line starting with a colon (:) and a name of the label, which can be any combination of characters as long as no whitespace or '.' character is present.
 When using a label as an argument to an instruction, the colon must be included.
 
-The following list describes each instruction, its arguments (if any) and what it does.
-In the list, an argument of "number" or "address" means the instruction will accept either an integer, variable, or constant as an argument.
+The following table provides the name of each instruction, its arguments (if any) and what it does.
+In the table, an argument of "number" or "address" means the instruction will accept either an integer, variable, or constant as an argument.
 If the argument is "label" the argument must be a label. 
-Instructions indicated like this<sup>x</sup> are macros, i.e., constructed from several machine instructions.
-* jmp :label<sup>x</sup> - branches to the specified label.  
-The next instruction to be executed is the instruction that is immediately after the specified label.
-* beq :label<sup>x</sup> - branches to the specified label if the top two values on the stack are equal.
-The next instruction to be executed is the instruction that is immediately after the specified label.
-* ld address - push the value stored at the memory address specified onto the stack.
-* print<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a decimal number.
-* printch<sup>x</sup> - pops and prints the value on the top of the stack to the screen as a ASCII character.
-* println<sup>x</sup> - prints a newline to the screen.
-* read<sup>x</sup> - reads a character of input from the user and pushes it on the stack.
-* add<sup>x</sup> - adds the top two values on the stack; pops both values off the stack; pushes the result on the stack
-* sub<sup>x</sup> - subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.
-* mul<sup>x</sup> - multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack
-* div<sup>x</sup> - divides the top value by the next value on the stack; pops both values off the stack; pushes the result on the stack.
-* zero - pushes the value 0 onto the stack.
-* one - pushes the value 1 onto the stack.
-* dup - pushes a copy of the value on top of the stack onto the stack.
-* down number - moves the element on top of the stack down the specified number of elements into the stack.
-* cmp<sup>x</sup> - compares the top two values on the stack, pops them both off the stack and pushes the result of the comparison.
-The comparison has three possible results.
-The result is -1 if the top value is less than the value underneath it.
-The result is 0 if both top values are equal.
-The result is 1 if the top value is greater than the value underneath it.
-Then pushes a copy of that number of top elements on the stack to the top of the stack.
-* ldi number - pushes number to the top of the stack.
-* st address - pops the top element off the stack and stores it at the specified address.
-* hlt - terminates the program.
-* jal label<sup>x</sup> - pushes the address of the next instruction on the stack and then jumps unconditionally to the address the specified label indicates.
-* ret - pops the top value off the stack and branches unconditionally to that address.
-* lda label<sup>x</sup> - pushes a value stored at a certain offset from label onto the stack.
-The offset must be pre-loaded onto the stack and is popped during the execution of this command.
-* sda label<sup>x</sup> - Pops and stores the value at the top of the stack at a specified memory location.
-The memory location is specified as the memory location specified by label plus an offset which is pre-loaded onto the stack.
+Instructions indicated like this<sup>x</sup> are macros, i.e., assembled into several machine instructions.
 
-
-
+|Name|Macro|Argument|Description|
+|---|---|---|---|
+|jmp|yes|:label|Branches to the specified label. The next instruction to be executed is the instruction that is immediately after the specified label.|
+|beq|yes|:label|branches to the specified label if the top two values on the stack are equal. The next instruction to be executed is the instruction that is immediately after the specified label.|
+|ld|no|address|Push the value stored at the memory address specified onto the stack.|
+|print|no|None|Pops and prints the value on the top of the stack to the screen as a decimal number.|
+|printch|no|None|Pops and prints the value on the top of the stack to the screen as a ASCII character.|
+|println|no|None|Prints a newline to the screen.|
+|read|no|None|Reads a character of input from the user and pushes it on the stack.|
+|add|no|None|Adds the top two values on the stack; pops both values off the stack; pushes the result on the stack.|
+|sub|no|None|Subtracts the top value from the next value on the stack; pops both values off the stack; pushes the result on the stack.|
+|mul|no|None|Multiplies the top two values on the stack; pops both values off the stack; pushes the result on the stack.|
+|div|no|None|Divides the top value by the next value on the stack; pops both values off the stack; pushes the result on the stack.|
+|zero|no|None|Pushes the value 0 onto the stack.|
+|one|no|None|Pushes the value 1 onto the stack.|
+|dup|no|None|Pushes a copy of the value on top of the stack onto the stack.|
+|down|no|number|Moves the element on top of the stack down the specified number of elements into the stack.|
+|cmp|no|None|Compares the top two values on the stack, pops them both off the stack and pushes the result of the comparison. The comparison has three possible results. The result is -1 if the top value is less than the value underneath it. The result is 0 if both top values are equal. The result is 1 if the top value is greater than the value underneath it.|
+|ldi|no|number|Pushes number to the top of the stack.|
+|st|no|address|Pops the top element off the stack and stores it at the specified address.|
+|hlt|no|None|Terminates the program.|
+|jal|yes|label|Pushes the address of the next instruction on the stack and then jumps unconditionally to the address the specified label indicates.|
+|ret|no|None|Pops the top value off the stack and branches unconditionally to that address. (Equivalent to the jmp machine instruction.)|
+|lda|yes|label|Pushes a value stored at a certain offset from label onto the stack. The offset must be pre-loaded onto the stack and is popped during the execution of this command.|
+|sda|yes|label|Pops and stores the value at the top of the stack at a specified memory location. The memory location is specified as the memory location specified by label plus an offset which is pre-loaded onto the stack.|
 
 <b>Comments.</b> a comment can be made on any line by using the semicolon (;) character.  
 All text on a line after this character is ignored.
