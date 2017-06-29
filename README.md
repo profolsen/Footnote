@@ -368,6 +368,7 @@ There are three kinds of arguments an instruction can have:
 3. label - the argument must be a branch label.
 
 Some instructions are macros, i.e., they are assembled into several machine instructions.  These instructions will are marked "yes" in the macro column.
+
 |Name|Macro|Argument|Description|
 |---|---|---|---|
 |jmp|yes|:label|Branches to the specified label. The next instruction to be executed is the instruction that is immediately after the specified label.|
