@@ -361,10 +361,13 @@ A label is a line starting with a colon (:) and a name of the label, which can b
 When using a label as an argument to an instruction, the colon must be included.
 
 The following table provides the name of each instruction, its arguments (if any) and what it does.
-In the table, an argument of "number" or "address" means the instruction will accept either an integer, variable, or constant as an argument.
-If the argument is "label" the argument must be a label. 
-Instructions indicated like this<sup>x</sup> are macros, i.e., assembled into several machine instructions.
+These restrictions are not entirely enforced by the assembler.  
+There are three kinds of arguments an instruction can have:
+1. number - an integer value or constant represented in decimal.  
+2. address - variable, string, or array representing a location in memory.
+3. label - the argument must be a branch label.
 
+Some instructions are macros, i.e., they are assembled into several machine instructions.  These instructions will are marked "yes" in the macro column.
 |Name|Macro|Argument|Description|
 |---|---|---|---|
 |jmp|yes|:label|Branches to the specified label. The next instruction to be executed is the instruction that is immediately after the specified label.|
