@@ -1,4 +1,4 @@
 language: bash
 
 script:
-    - bash test.sh
+    - bash test_assembler_and_vm.sh
