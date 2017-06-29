@@ -277,7 +277,9 @@ Each of these sections begins with ".declare", ".begin" or ".include" on a line 
 
 <b>The .include Section.</b>
 The .include section contains a list of files to include.
-Files may be in the same directory, only the file name (.ftnt extension is assumed) is needed or files may be in a different directory, in which case the path and file name (.ftnt extension is assumed) are needed.
+A File can be included from any directory.
+If the file is in the same directory as the file being assembled, then only the file name (the .ftnt extension is assumed) is needed.
+If the file is in a different directory from the file being assembled, then the path and file name are needed.
 Any label, variable, constant, string and array from the included file is accessible by redirection.
 For example to access a variable called 'alex' from the file 'code', use the label ':code.alex'.
 An example of an include is:
