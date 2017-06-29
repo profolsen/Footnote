@@ -224,10 +224,7 @@ It then executes a mathematical operation on them (e.g., add) and pushes the res
 |sub|0x2|Subtracts the second to top value on the stack from the top value on the stack.|
 |mul|0x3|Multiplies the top two values on the stack together.|
 |div|0x4|Divides the top value on the stack by the second to top value on the stack.|
-|cmp|0x5|This instruction compares the top two values on the stack.
-If the two values are equal, a zero is pushed.
-If the top value is greater, a one is pushed.
-If the top value is less than the second to top value, a negative 1 is pushed.|
+|cmp|0x5|This instruction compares the top two values on the stack. If the two values are equal, a zero is pushed. If the top value is greater, a one is pushed. If the top value is less than the second to top value, a negative 1 is pushed.|
 
 <b>System Calls.</b>
 When describing various system calls, the following format is used:
