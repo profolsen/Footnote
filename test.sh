@@ -6,5 +6,7 @@ cp expected.txt bin/expected.txt
 cd bin
 java Test > actual.txt
 diff actual.txt expected.txt
+exitval=$?
 cd ..
 rm -r bin
+exit "$exitval"
