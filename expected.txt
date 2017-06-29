@@ -1,0 +1,63 @@
+samples/errtestasm.ftnt
+Could not link doesntexist.ftnt @errtestasm.ftnt:2
+Undefined Instruction badopcode @include_err.ftnt:4
+Undefined Instruction chickens @errtestasm.ftnt:12
+Undefined array name: @include_err.ftnt:5
+Undefined branch label @errtestasm.ftnt:7
+Undefined array name: @errtestasm.ftnt:8
+Could not link doesntexist.ftnt @errtestasm.ftnt:2
+Undefined Instruction badopcode @include_err.ftnt:4
+Undefined Instruction chickens @errtestasm.ftnt:12
+Undefined array name: @include_err.ftnt:5
+Undefined branch label @errtestasm.ftnt:7
+Undefined array name: @errtestasm.ftnt:8
+Invalid Program
+samples/fibonacci.i
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+samples/include_1.ftnt
+813
+814
+815
+h
+o
+816
+samples/include_err.ftnt
+Undefined Instruction badopcode @include_err.ftnt:4
+Undefined array name: @include_err.ftnt:5
+Undefined Instruction badopcode @include_err.ftnt:4
+Undefined array name: @include_err.ftnt:5
+Invalid Program
+samples/includetestasm.ftnt
+42
+samples/jaltestasm.ftnt
+4
+samples/memtestasm.ftnt
+samples/memtestbadasm.ftnt
+Overfull stack @14
+samples/program.ftnt
+1
+2
+3
+5
+8
+13
+21
+34
+55
+89
+144
+233
+samples/self_include.ftnt
+samples/stringtestasm.ftnt
+this is a string
