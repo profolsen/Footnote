@@ -25,10 +25,10 @@ SOFTWARE.
 # Footnote
 [![Build Status](https://travis-ci.org/profolsen/Footnote.svg?branch=master)](https://travis-ci.org/profolsen/Footnote)
 
-Name
+<!-- Name
 -----
 
-This project began as a footnote to a different project I was working on at the time but took on a life of it's own, much like the footnotes of [David Foster Wallace](https://en.wikipedia.org/wiki/David_Foster_Wallace).
+This project began as a footnote to a different project I was working on at the time but took on a life of it's own, much like the footnotes of [David Foster Wallace](https://en.wikipedia.org/wiki/David_Foster_Wallace). -->
 
 Setup
 ---------
